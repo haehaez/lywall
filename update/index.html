@@ -76,10 +76,25 @@ body.drag #drop{display:flex}
 #bar #menu button{width:100%;text-align:left}
 #bar #menu button:hover,#bar #gear:hover{border-color:var(--acc)}
 #menu #hud{text-align:center}
-#bar #gear{width:42px;height:42px;padding:0;border-radius:10px;font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;transition:transform .2s,border-color .2s}
-#bar.open #gear{transform:rotate(60deg);border-color:var(--acc)}
+#bar #gear{width:42px;height:42px;padding:0;border-radius:10px;font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s,transform .12s}
+#bar #gear:active{transform:scale(.94)}
+#gear .g2{display:none;font-size:17px}
+#bar.open #gear{border-color:var(--acc);background:rgba(91,140,255,.18)}
+#bar.open #gear .g1{display:none}
+#bar.open #gear .g2{display:inline}
+#cfg{position:fixed;right:12px;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:99999;width:min(320px,calc(100vw - 24px));flex-direction:column;gap:10px;padding:12px;border-radius:14px;background:rgba(18,20,25,.97);border:1px solid rgba(255,255,255,.1);box-shadow:0 14px 36px rgba(0,0,0,.6)}
+#cfg .phd{font-weight:600;font-size:14px}
+.ctabs{display:flex;gap:6px}
+.ctabs button{flex:1;padding:7px 10px;border-radius:8px;border:1px solid #2b2e35;background:#14161a;color:var(--fg);font-size:13px;cursor:pointer}
+.ctabs button:hover{border-color:var(--acc)}
+.ctabs button.on{border-color:var(--acc);background:rgba(91,140,255,.18)}
+.cpane{display:flex;flex-direction:column;gap:6px}
+.crow{display:flex;justify-content:space-between;gap:12px;padding:10px;border-radius:10px;background:rgba(255,255,255,.04);font-size:13px}
+.crow span{color:var(--mute)}
+.soon{margin:0;padding:6px 2px;font-size:13px;color:var(--mute)}
 #bar.open{opacity:1!important}
-body:hover #bar{opacity:.9}
+#bar.show{opacity:.9}
+@media (hover:hover){#bar:not(.show):not(.open){pointer-events:none}}
 #bar button{padding:8px 12px;border-radius:8px;border:1px solid #2b2e35;background:rgba(20,22,26,.92);color:var(--fg);font-size:13px;cursor:pointer}
 #upd{position:fixed;top:12px;right:12px;z-index:99999;padding:9px 14px;border-radius:10px;border:1px solid var(--acc);background:rgba(91,140,255,.22);color:#fff;font-size:13px;font-weight:600;cursor:pointer;display:none}
 #upd:hover{background:rgba(91,140,255,.4)}
@@ -178,8 +193,15 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 <input id="phfile" type="file" accept="video/*,image/*,.mkv,.mov" hidden>
 <div id="ctxmenu" role="menu"></div>
 <div id="drop">Solte para adicionar à parede</div>
+<div id="cfg" role="dialog" aria-label="Configurações" style="display:none">
+  <div class="phd">Configurações</div>
+  <div class="ctabs"><button type="button" data-t="geral" class="on">Geral</button><button type="button" data-t="perfil">Perfil</button><button type="button" data-t="outros">Outros</button></div>
+  <div class="cpane" data-p="geral"><div class="crow"><span>Versão do app</span><b id="cVer">—</b></div><div class="crow"><span>Última atualização</span><b id="cDate">—</b></div></div>
+  <div class="cpane" data-p="perfil" style="display:none"><p class="soon">Em breve: perfil e preferências salvas.</p></div>
+  <div class="cpane" data-p="outros" style="display:none"><p class="soon">Em breve.</p></div>
+</div>
 <button id="upd" type="button"></button>
-<div id="bar"><div id="menu"><span id="hud" style="display:none"></span><button id="perf" type="button">Desempenho: Auto</button><button id="add" type="button">Adicionar mídia</button><button id="addtext" type="button">Adicionar texto</button><button id="presetsBtn" type="button">Presets</button><button id="arrange" type="button">Organizar tudo</button><button id="clear" type="button">Limpar parede</button></div><button id="gear" type="button" aria-label="Configurações" aria-expanded="false">⚙</button></div>
+<div id="bar"><div id="menu"><span id="hud" style="display:none"></span><button id="perf" type="button">Desempenho: Máximo</button><button id="add" type="button">Adicionar mídia</button><button id="addtext" type="button">Adicionar texto</button><button id="presetsBtn" type="button">Presets</button><button id="arrange" type="button">Organizar tudo</button><button id="clear" type="button">Limpar parede</button><button id="cfgBtn" type="button">Configurações</button></div><button id="gear" type="button" aria-label="Menu" aria-expanded="false"><span class="g1">⚙</span><span class="g2">✕</span></button></div>
 <input id="file" type="file" accept="video/*,image/*,.mkv,.mov,.mp4,.webm,.gif,.avif" multiple hidden>
 <script>
 const wall=document.getElementById('wall'),empty=document.getElementById('empty'),file=document.getElementById('file');
@@ -264,7 +286,7 @@ function autoArrange(){
 }
 const tileByEl=new Map();
 const MODES=['auto','max','bal','eco'],MODE_LABEL={auto:'Auto',max:'Máximo',bal:'Equilibrado',eco:'Econômico'};
-let mode='auto',budgetAuto=6,fps=60,peak=60,schedT=0;
+let mode='max',budgetAuto=6,fps=60,peak=60,schedT=0;
 const budget=()=>mode==='max'?Infinity:mode==='bal'?8:mode==='eco'?3:budgetAuto;
 const io=new IntersectionObserver(es=>{
   es.forEach(e=>{const t=tileByEl.get(e.target);if(t)t.vis=e.isIntersecting});
@@ -777,6 +799,41 @@ refreshEmpty();
   m.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&b.id!=='perf')set(false)});
   addEventListener('pointerdown',e=>{if(!bar.contains(e.target))set(false)},true);
   addEventListener('keydown',e=>{if(e.key==='Escape')set(false)});
+})();
+/* ---------- configurações + auto-ocultar ---------- */
+(function(){
+  const bar=document.getElementById('bar'),cfg=document.getElementById('cfg'),pres=document.getElementById('presets');
+  const dd=window.desktop,KEY='ly:ver';
+  const fmt=t=>new Date(t).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
+  const rd=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){return null}};
+  if(dd&&dd.appVersion){dd.appVersion().then(v=>{const r=rd();if(!r||r.v!==v){try{localStorage.setItem(KEY,JSON.stringify({v,t:Date.now()}))}catch(e){}}}).catch(()=>{})}
+  async function fill(){
+    const v=document.getElementById('cVer'),d=document.getElementById('cDate');
+    if(dd&&dd.appVersion){
+      let ver='?';try{ver=await dd.appVersion()}catch(e){}
+      const r=rd();v.textContent=ver;d.textContent=r&&r.v===ver?fmt(r.t):'—';
+    }else{v.textContent='Web';d.textContent='Automática'}
+  }
+  document.getElementById('cfgBtn').onclick=()=>{
+    if(cfg.style.display==='flex'){cfg.style.display='none';return}
+    pres.style.display='none';cfg.style.display='flex';fill();
+  };
+  document.getElementById('menu').addEventListener('click',e=>{if(e.target.id==='presetsBtn')cfg.style.display='none'});
+  cfg.querySelectorAll('.ctabs button').forEach(b=>b.onclick=()=>{
+    cfg.querySelectorAll('.ctabs button').forEach(x=>x.classList.toggle('on',x===b));
+    cfg.querySelectorAll('.cpane').forEach(p=>p.style.display=p.dataset.p===b.dataset.t?'':'none');
+  });
+  addEventListener('pointerdown',e=>{if(cfg.style.display==='flex'&&!cfg.contains(e.target)&&e.target.id!=='cfgBtn')cfg.style.display='none'},true);
+  let t=0,last=0;
+  const wake=()=>{
+    const n=Date.now();if(n-last<250&&bar.classList.contains('show'))return;last=n;
+    bar.classList.add('show');clearTimeout(t);
+    t=setTimeout(()=>{if(bar.matches(':hover')||bar.classList.contains('open'))wake();else bar.classList.remove('show')},6700);
+  };
+  addEventListener('pointermove',wake,{passive:true});
+  addEventListener('pointerdown',wake,true);
+  bar.addEventListener('pointerleave',()=>{last=0;wake()});
+  wake();
 })();
 /* ---------- atualização (só no app desktop) ---------- */
 (function(){
