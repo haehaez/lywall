@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Parede de vídeos</title>
+<title>LY(wall)</title>
 <style>
 :root{color-scheme:dark;--bg:#08090b;--fg:#e8e9ec;--mute:#7d8088;--acc:#5b8cff;--holo-v:linear-gradient(to bottom,#d6c6f1,#f6c8e3,#c8dcf6,#f4efc8,#f3c7de,#cbbdef);--holo-h:linear-gradient(to right,#d6c6f1,#f6c8e3,#c8dcf6,#f4efc8,#f3c7de,#cbbdef);--holo-d:linear-gradient(135deg,#d6c6f1,#f6c8e3,#c8dcf6,#f4efc8,#f3c7de,#cbbdef);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
@@ -59,8 +59,12 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 @container (max-width:260px){.zl{display:none}}
 @container (max-width:200px){.zg{display:none}}
 #empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;pointer-events:none}
-#empty h1{font-size:clamp(26px,5vw,44px);margin:0;font-weight:600;letter-spacing:-.02em}
+#empty h1{font-size:clamp(16px,2.4vw,22px);margin:0;font-weight:500;letter-spacing:-.01em}
 #empty p{margin:0;color:var(--mute);max-width:50ch;line-height:1.5}
+.logo{display:flex;align-items:baseline;justify-content:center;gap:.1em;font-size:clamp(76px,15vw,132px);line-height:1;user-select:none;margin-bottom:4px}
+.logo b{font-weight:800;letter-spacing:-.05em;padding-right:.05em;background:var(--holo-d);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo span{font-size:.22em;font-weight:500;letter-spacing:.06em;color:var(--mute)}
+#empty .fmt{display:flex;flex-direction:column;gap:6px;font-family:ui-monospace,Consolas,"SFMono-Regular",monospace;font-size:13px;letter-spacing:.1em;color:var(--mute)}
 #empty button{pointer-events:auto;margin-top:6px;padding:10px 18px;border-radius:8px;border:1px solid #2b2e35;background:#14161a;color:var(--fg);font-size:15px;cursor:pointer}
 #empty button:hover,#empty button:focus-visible{border-color:var(--acc)}
 #drop{position:absolute;inset:10px;border:2px dashed var(--acc);border-radius:14px;background:rgba(91,140,255,.08);display:none;align-items:center;justify-content:center;font-size:22px;pointer-events:none;z-index:99999}
@@ -156,8 +160,9 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 <body>
 <div id="wall"><div id="canvas"></div></div>
 <div id="empty">
+  <div class="logo" role="img" aria-label="LY(wall)"><b>LY</b><span>(wall)</span></div>
   <h1>Solte seus vídeos e imagens aqui</h1>
-  <p>Arraste vídeos (mp4, mov, mkv, webm) e imagens (jpg, png, gif, webp) para a tela: cada item se encaixa sozinho no próximo espaço livre e a parede cresce para baixo quando enche. Puxe a borda ou o canto de um vídeo para mudar o tamanho da caixa e use a alça do topo para mover. Arraste dentro do vídeo para o enquadramento e use a roda do mouse para o zoom. O botão direito em um vídeo abre a velocidade de reprodução.</p>
+  <p class="fmt"><span>mp4 · gif · webm</span><span>png · jpg · webp</span></p>
   <button id="pick" type="button">Escolher arquivos</button>
 </div>
 <div id="presets" role="dialog" aria-label="Presets" style="display:none">
