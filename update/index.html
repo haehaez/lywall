@@ -774,6 +774,14 @@ addEventListener('dragenter',e=>{e.preventDefault();depth++;document.body.classL
 addEventListener('dragover',e=>e.preventDefault());
 addEventListener('dragleave',()=>{depth=Math.max(0,depth-1);if(!depth)document.body.classList.remove('drag')});
 addEventListener('drop',e=>{e.preventDefault();depth=0;document.body.classList.remove('drag');addFiles(e.dataTransfer.files)});
+addEventListener('paste',e=>{
+  const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+  const cd=e.clipboardData;if(!cd)return;
+  const ok=f=>/^(video|image)\//.test(f.type)||/\.(mp4|webm|mkv|mov|gif|avif|png|jpe?g|webp)$/i.test(f.name);
+  const list=[...(cd.files||[])].filter(ok);
+  if(!list.length)return;
+  e.preventDefault();addFiles(list);
+});
 addEventListener('resize',()=>{fitCanvas();tiles.forEach(applyRect)});
 document.getElementById('pick').onclick=document.getElementById('add').onclick=()=>file.click();
 file.onchange=()=>{addFiles(file.files);file.value=''};
