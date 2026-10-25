@@ -1,7 +1,7 @@
 {
-  "version": "1.0.7",
+  "version": "1.0.8",
   "file": "index.html",
-  "releasedAt": "2026-10-25T22:15:14.635Z",
-  "notes": "Atalhos, avisos no app, escolher pasta e rede de segurança",
+  "releasedAt": "2026-10-25T22:56:43.046Z",
+  "notes": "Sessão salva sozinha, refazer, menos peso na reprodução",
   "sha256": "92b3724f6c4fe9cfcc17eb92806b152fcb1dae33d1e2ed7f81c744cf861b3759"
 }
