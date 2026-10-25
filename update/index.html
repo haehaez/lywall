@@ -126,6 +126,14 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 .qchip{position:absolute;top:34px;left:14px;z-index:2;font-size:11px;padding:3px 8px;border-radius:10px;background:rgba(14,16,20,.7);color:#fff;font-variant-numeric:tabular-nums;pointer-events:none;opacity:0;transition:opacity .15s}
 .tile:not(.hasrate) .qchip{top:12px}
 .tile:hover .qchip,.qchip.busy{opacity:1}
+#toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(8px);z-index:100002;max-width:min(520px,calc(100vw - 32px));padding:9px 14px;border-radius:10px;background:rgba(24,26,31,.97);border:1px solid rgba(255,255,255,.12);color:var(--fg);font-size:13px;line-height:1.4;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;white-space:pre-line}
+#toast.on{opacity:1;transform:translateX(-50%)}
+#dlg{position:fixed;inset:0;z-index:100003;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55)}
+#dlg .box{width:min(400px,calc(100vw - 32px));padding:18px;border-radius:14px;background:#14161a;border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 48px rgba(0,0,0,.6)}
+#dlg p{margin:0 0 14px;font-size:14px;line-height:1.5;white-space:pre-line}
+#dlg .row{display:flex;justify-content:flex-end;gap:8px}
+#dlg button{padding:8px 14px;border-radius:8px;border:1px solid #2b2e35;background:#1a1d22;color:var(--fg);font-size:13px;cursor:pointer}
+#dlg button.ok{border-color:var(--acc);background:rgba(91,140,255,.22)}
 .rate{position:absolute;top:12px;left:14px;z-index:2;font-size:11px;padding:3px 8px;border-radius:10px;background:rgba(14,16,20,.7);color:#fff;font-variant-numeric:tabular-nums;pointer-events:none}
 .rate{opacity:0;transition:opacity .15s}
 .tile:hover .rate{opacity:1}
@@ -195,17 +203,27 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
   <div class="pft"><button id="pexp" type="button">Exportar</button><button id="pimp" type="button">Importar</button></div>
   <div id="pmsg"></div>
 </div>
-<div id="pending" style="display:none"><span></span><button id="pendbtn" type="button">Selecionar arquivos</button></div>
+<div id="pending" style="display:none"><span></span><button id="pendbtn" type="button">Selecionar arquivos</button><button id="pendfolder" type="button">Escolher pasta</button></div>
 <input id="pfile" type="file" accept=".json,application/json" hidden>
 <input id="phfile" type="file" accept="video/*,image/*,.mkv,.mov" hidden>
+<input id="folderfile" type="file" webkitdirectory multiple hidden>
 <div id="ctxmenu" role="menu"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="dlg" role="dialog" aria-modal="true"><div class="box"><p></p><div class="row"><button type="button" class="no">Cancelar</button><button type="button" class="ok">OK</button></div></div></div>
 <div id="drop">Solte para adicionar à parede</div>
 <div id="cfg" role="dialog" aria-label="Configurações" style="display:none">
   <div class="phd">Configurações</div>
-  <div class="ctabs"><button type="button" data-t="geral" class="on">Geral</button><button type="button" data-t="perfil">Perfil</button><button type="button" data-t="outros">Outros</button></div>
+  <div class="ctabs"><button type="button" data-t="geral" class="on">Geral</button><button type="button" data-t="perfil">Perfil</button><button type="button" data-t="atalhos">Atalhos</button></div>
   <div class="cpane" data-p="geral"><div class="crow"><span>Versão do app</span><b id="cVer">—</b></div><div class="crow"><span>Última atualização</span><b id="cDate">—</b></div></div>
   <div class="cpane" data-p="perfil" style="display:none"><p class="soon">Em breve: perfil e preferências salvas.</p></div>
-  <div class="cpane" data-p="outros" style="display:none"><p class="soon">Em breve.</p></div>
+  <div class="cpane" data-p="atalhos" style="display:none">
+    <div class="crow"><span>Desfazer</span><b>Ctrl+Z</b></div>
+    <div class="crow"><span>Colar arquivos</span><b>Ctrl+V</b></div>
+    <div class="crow"><span>Remover a caixa selecionada</span><b>Delete</b></div>
+    <div class="crow"><span>Pausar / retomar tudo</span><b>Espaço</b></div>
+    <div class="crow"><span>Silenciar tudo</span><b>M</b></div>
+    <div class="crow"><span>Tela cheia na caixa selecionada</span><b>F</b></div>
+  </div>
 </div>
 <button id="upd" type="button"></button>
 <div id="bar"><div id="menu"><span id="hud" style="display:none"></span><button id="perf" type="button">Desempenho: Máximo</button><button id="add" type="button">Adicionar mídia</button><button id="addtext" type="button">Adicionar texto</button><button id="presetsBtn" type="button">Presets</button><button id="arrange" type="button">Organizar tudo</button><button id="clear" type="button">Limpar parede</button><button id="cfgBtn" type="button">Configurações</button></div><button id="gear" type="button" aria-label="Menu" aria-expanded="false"><span class="g1">⚙</span><span class="g2">✕</span></button></div>
@@ -294,6 +312,7 @@ function autoArrange(){
 }
 const tileByEl=new Map();
 const MODES=['auto','max','bal','eco'],MODE_LABEL={auto:'Auto',max:'Máximo',bal:'Equilibrado',eco:'Econômico'};
+let gPaused=false;
 let mode='max',budgetAuto=6,fps=60,peak=60,schedT=0;
 const budget=()=>mode==='max'?Infinity:mode==='bal'?8:mode==='eco'?3:budgetAuto;
 const io=new IntersectionObserver(es=>{
@@ -312,7 +331,7 @@ function runSchedule(){
     sc+=t.fw*t.fh*200;
     return sc;
   };
-  const cand=document.hidden?[]:vids.filter(t=>t.vis).sort((a,b)=>score(b)-score(a));
+  const cand=(document.hidden||gPaused)?[]:vids.filter(t=>t.vis).sort((a,b)=>score(b)-score(a));
   const B=budget(),play=new Set();let used=0;
   for(const t of cand){if(play.size===0||used+t.cost<=B){play.add(t);used+=t.cost}}
   vids.forEach(t=>{
@@ -439,7 +458,10 @@ menu.addEventListener('contextmenu',e=>e.preventDefault());
 const QUALS=[1080,720,480,360,240];let qSeq=0;const qJobs=new Map();
 function applySrc(item,url){
   const v=item.v,t=v.currentTime,pl=!v.paused,rt=item.rate||1;
-  v.addEventListener('loadedmetadata',()=>{try{v.currentTime=t}catch(e){}v.playbackRate=rt;if(pl)v.play().catch(()=>{})},{once:true});
+  v.addEventListener('loadedmetadata',()=>{try{v.currentTime=t}catch(e){}v.playbackRate=rt;if(v.videoWidth&&v.videoHeight)item.cost=Math.max(.25,v.videoWidth*v.videoHeight/(1280*720));if(pl)v.play().catch(()=>{});schedule()},{once:true});
+  if(item._qerr)v.removeEventListener('error',item._qerr);
+  item._qerr=()=>{if(item.q&&url!==item.url){item.q=0;applySrc(item,item.url);qChip(item);toast('A cópia leve não abriu; voltei ao original.',3500)}};
+  v.addEventListener('error',item._qerr,{once:true});
   v.src=url;v.load();
 }
 function qChip(item){
@@ -465,7 +487,7 @@ async function setQuality(item,q){
   qJobs.delete(id);item.qJob=null;
   if(r&&r.ok&&r.path){applySrc(item,pathToUrl(r.path));item.q=q;qChip(item)}
   else if(r&&r.ok&&r.same){qNote(item,'Já está em '+q+'p ou menos')}
-  else{qChip(item);if(r&&!r.cancelled)alert('Não foi possível reduzir a qualidade.\n\n'+(r.error||''))}
+  else{qChip(item);if(r&&!r.cancelled)toast('Não foi possível reduzir a qualidade.\n'+(r.error||''),5000)}
 }
 if(window.desktop&&window.desktop.onProxyProgress)window.desktop.onProxyProgress(({id,pct})=>{const it=qJobs.get(id);if(it){it.qPct=pct;qChip(it)}});
 addEventListener('pointerdown',e=>{if(!menu.contains(e.target))closeMenu()},true);
@@ -576,10 +598,31 @@ function writePresets(a){
   memPresets=a;
   try{localStorage.setItem(PKEY,JSON.stringify(a));return true}catch(e){return false}
 }
+/* ---------- avisos (toast) e confirmação ---------- */
+let toastT=0;
+function toast(msg,ms){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),ms||2200)}
+function ask(msg,okLabel){
+  return new Promise(res=>{
+    const d=document.getElementById('dlg'),ok=d.querySelector('.ok'),no=d.querySelector('.no');
+    d.querySelector('p').textContent=msg;ok.textContent=okLabel||'OK';d.style.display='flex';ok.focus();
+    const end=v=>{d.style.display='none';ok.onclick=no.onclick=null;d.onkeydown=null;res(v)};
+    ok.onclick=()=>end(true);no.onclick=()=>end(false);
+    d.onkeydown=e=>{if(e.key==='Escape'){e.stopPropagation();end(false)}};
+  });
+}
+function relinkFromFolder(list){
+  const files=[...list],phs=()=>tiles.filter(t=>t.ph),total=phs().length;let n=0;
+  hgroup(()=>files.forEach(f=>{
+    const ph=phs().find(t=>t.entry.name===f.name&&(!t.entry.size||t.entry.size===f.size))||phs().find(t=>t.entry.name===f.name);
+    if(ph){linkPlaceholder(ph,f);n++}
+  }));
+  toast(n?n+' de '+total+' arquivo(s) encontrado(s) na pasta.':'Nenhum arquivo da pasta corresponde ao preset.',3500);
+}
+const ULBL={rect:'mover/redimensionar',view:'zoom/enquadramento',arr:'organizar tudo',add:'adicionar',rm:'remover',grp:'ação em grupo'};
 /* ---------- desfazer (Ctrl+Z) ---------- */
 const hist=[],HMAX=50;let hOff=0,hgrp=null;
 function hpush(e){if(hOff)return;if(hgrp){hgrp.push(e);return}hist.push(e);while(hist.length>HMAX)hfinal(hist.shift())}
-function hgroup(fn){hgrp=[];try{fn()}finally{const g=hgrp;hgrp=null;if(g.length)hpush(g.length===1?g[0]:{t:'grp',list:g})}}
+function hgroup(fn){if(hgrp){fn();return}hgrp=[];try{fn()}finally{const g=hgrp;hgrp=null;if(g.length)hpush(g.length===1?g[0]:{t:'grp',list:g})}}
 function hfinal(e){
   if(e.t==='grp')e.list.forEach(hfinal);
   else if(e.t==='rm')e.items.forEach(x=>{if(x.item.hidden&&x.item.destroy)x.item.destroy()});
@@ -596,9 +639,9 @@ function hrev(e){
   else if(e.t==='rm'){e.items.forEach(x=>x.item.restore(x.a,x.z))}
 }
 function undo(){
-  const e=hist.pop();if(!e)return;
+  const e=hist.pop();if(!e){toast('Nada para desfazer',1400);return}
   hOff++;try{hrev(e)}finally{hOff--}
-  refreshEmpty();fitCanvas();schedule();
+  refreshEmpty();fitCanvas();schedule();toast('Desfeito: '+(ULBL[e.t]||'ação'),1600);
 }
 function killTile(t){
   if(t.qJob)cancelQ(t);
@@ -636,12 +679,13 @@ function snapshot(){
   }).sort((a,b)=>a.zi-b.zi);
 }
 let phTarget=null;
+let hoverPh=null;
 function makePlaceholder(e,rect,z){
   const el=document.createElement('div');el.className='tile ph';el.style.zIndex=z;
   const body=document.createElement('div');body.className='phbody';
   const t1=document.createElement('span');t1.textContent='Arquivo aguardando';
   const nm=document.createElement('b');nm.className='phname';nm.textContent=e.name||'(sem nome)';
-  const t2=document.createElement('small');t2.textContent='Solte o arquivo aqui ou clique para escolher';
+  const t2=document.createElement('small');t2.textContent='Solte o arquivo aqui, clique para escolher ou passe o mouse e aperte Ctrl+V';
   const cp=document.createElement('button');cp.type='button';cp.className='phcopy';cp.textContent='Copiar nome';
   cp.addEventListener('click',async ev=>{
     ev.stopPropagation();
@@ -665,11 +709,13 @@ function makePlaceholder(e,rect,z){
   canvas.appendChild(el);applyRect(item);
   el.addEventListener('pointerdown',()=>{el.style.zIndex=++zTop});
   el.addEventListener('click',ev=>{if(ev.target.closest('.grip,.x,.hd,.phname,.phcopy')||String(getSelection()).length)return;phTarget=item;const pf=document.getElementById('phfile');pf.value='';pf.click()});
-  x.addEventListener('click',()=>{tiles=tiles.filter(t=>t!==item);el.remove();refreshEmpty();fitCanvas()});
+  x.addEventListener('click',()=>{if(hoverPh===item)hoverPh=null;tiles=tiles.filter(t=>t!==item);el.remove();refreshEmpty();fitCanvas()});
+  el.addEventListener('pointerenter',()=>{hoverPh=item});
+  el.addEventListener('pointerleave',()=>{if(hoverPh===item)hoverPh=null});
 }
 function linkPlaceholder(item,file){
   const e=item.entry,rect={fx:item.fx,fy:item.fy,fw:item.fw,fh:item.fh},z=item.el.style.zIndex;
-  tiles=tiles.filter(t=>t!==item);item.el.remove();
+  tiles=tiles.filter(t=>t!==item);item.el.remove();if(hoverPh===item)hoverPh=null;
   addVideo(file,{rect,state:e.state,z});
   refreshEmpty();
 }
@@ -762,6 +808,8 @@ function initPresets(){
   };
   document.getElementById('phfile').onchange=e=>{const f=e.target.files[0];if(f&&phTarget&&tiles.includes(phTarget))linkPlaceholder(phTarget,f)};
   document.getElementById('pendbtn').onclick=()=>file.click();
+  document.getElementById('pendfolder').onclick=()=>{const fi=document.getElementById('folderfile');fi.value='';fi.click()};
+  document.getElementById('folderfile').onchange=e=>{relinkFromFolder(e.target.files)};
   addEventListener('pointerdown',e=>{if(panel.style.display==='flex'&&!panel.contains(e.target)&&e.target.id!=='presetsBtn')closePanel()},true);
 }
 const IMG_EXT=/\.(png|jpe?g|gif|webp|avif|bmp|svg|apng|ico)$/i,VID_EXT=/\.(mp4|m4v|webm|mov|mkv|ogv|avi|3gp)$/i;
@@ -912,13 +960,26 @@ addEventListener('keydown',e=>{
   if(t&&t.matches&&t.matches('textarea,[contenteditable],input:not([type=range]):not([type=color])'))return;
   e.preventDefault();undo();
 });
+addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(document.getElementById('dlg').style.display==='flex')return;
+  const t=e.target;
+  if(t&&t.matches&&t.matches('textarea,[contenteditable],input,select,button'))return;
+  const ae=document.activeElement,tileEl=ae&&ae.closest?ae.closest('.tile'):null,k=e.key.toLowerCase();
+  if(k==='delete'&&tileEl){const it=tiles.find(x=>x.el===tileEl);if(it&&it.removeFn){e.preventDefault();it.removeFn()}}
+  else if(k===' '){e.preventDefault();gPaused=!gPaused;schedule();toast(gPaused?'Tudo pausado (Espaço para retomar)':'Reprodução retomada',1400)}
+  else if(k==='m'){tiles.forEach(x=>{if(!x.isImg&&x.v){x.v.muted=true;if(x.refreshVol)x.refreshVol()}});toast('Tudo silenciado',1400)}
+  else if(k==='f'&&tileEl&&tileEl.requestFullscreen){e.preventDefault();if(document.fullscreenElement)document.exitFullscreen();else tileEl.requestFullscreen().catch(()=>{})}
+});
 addEventListener('paste',e=>{
   const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
   const cd=e.clipboardData;if(!cd)return;
   const ok=f=>/^(video|image)\//.test(f.type)||/\.(mp4|webm|mkv|mov|gif|avif|png|jpe?g|webp)$/i.test(f.name);
   const list=[...(cd.files||[])].filter(ok);
   if(!list.length)return;
-  e.preventDefault();addFiles(list);
+  e.preventDefault();
+  if(hoverPh&&hoverPh.ph){const ph=hoverPh;hoverPh=null;const first=list.shift();hgroup(()=>{linkPlaceholder(ph,first);if(list.length)addFiles(list)})}
+  else addFiles(list);
 });
 addEventListener('resize',()=>{fitCanvas();tiles.forEach(applyRect)});
 document.getElementById('pick').onclick=document.getElementById('add').onclick=()=>file.click();
@@ -957,7 +1018,8 @@ refreshEmpty();
     const v=document.getElementById('cVer'),d=document.getElementById('cDate');
     if(dd&&dd.appVersion){
       let ver='?';try{ver=await dd.appVersion()}catch(e){}
-      const r=rd();v.textContent=ver;d.textContent=r&&r.v===ver?fmt(r.t):'—';
+      let rel=null;if(dd.appInfo){try{rel=(await dd.appInfo()).releasedAt}catch(e){}}
+      const r=rd();v.textContent=ver;d.textContent=rel?fmt(rel):(r&&r.v===ver?fmt(r.t):'—');
     }else{v.textContent='Web';d.textContent='Automática'}
   }
   document.getElementById('cfgBtn').onclick=()=>{
@@ -984,11 +1046,11 @@ refreshEmpty();
 /* ---------- atualização (só no app desktop) ---------- */
 (function(){
   const d=window.desktop;if(!d||!d.applyUpdate)return;
-  const b=document.getElementById('upd');let busy=false;
-  function show(i){b.textContent='\u2B07 Atualiza\u00e7\u00e3o '+i.version+' dispon\u00edvel';b.disabled=false;b.style.display='block'}
+  const b=document.getElementById('upd');let busy=false,latest=null;
+  function show(i){latest=i;b.textContent='\u2B07 Atualiza\u00e7\u00e3o '+i.version+' dispon\u00edvel';b.disabled=false;b.style.display='block'}
   b.onclick=async()=>{
     if(busy)return;
-    if(!confirm('Baixar e aplicar a atualiza\u00e7\u00e3o?\n\nA parede atual ser\u00e1 fechada. Salve como preset antes, se quiser mant\u00ea-la.'))return;
+    if(!await ask('Baixar e aplicar a atualização?\n\nA parede atual será fechada. Salve como preset antes, se quiser mantê-la.'+(latest&&latest.notes?'\n\nNovidades:\n'+latest.notes:''),'Atualizar'))return;
     busy=true;b.disabled=true;b.textContent='Baixando\u2026';
     let r;try{r=await d.applyUpdate()}catch(e){r={ok:false}}
     if(r&&r.ok){b.textContent='Aplicando\u2026'}

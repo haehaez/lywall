@@ -1,5 +1,7 @@
 {
-  "version": "1.0.6",
+  "version": "1.0.7",
   "file": "index.html",
-  "sha256": "575aedab38148e58c76fac3a30b205987206795a075fb6c4dfbc866a54b54aca"
+  "releasedAt": "2026-10-25T22:15:14.635Z",
+  "notes": "Atalhos, avisos no app, escolher pasta e rede de segurança",
+  "sha256": "92b3724f6c4fe9cfcc17eb92806b152fcb1dae33d1e2ed7f81c744cf861b3759"
 }
