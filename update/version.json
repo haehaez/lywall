@@ -1,7 +1,8 @@
 {
-  "version": "1.0.8",
+  "version": "1.0.10",
   "file": "index.html",
-  "releasedAt": "2026-10-25T22:56:43.046Z",
-  "notes": "Sessão salva sozinha, refazer, menos peso na reprodução",
-  "sha256": "92b3724f6c4fe9cfcc17eb92806b152fcb1dae33d1e2ed7f81c744cf861b3759"
+  "releasedAt": "2026-10-27T07:13:38.630Z",
+  "notes": "Atualização assinada",
+  "sha256": "c58888b640d3329945e3985add1515dc4b8152af89112f94460b8d4ad27b53c3",
+  "sig": "JclJAF0ARc3Reop3MdoxYLDntCrbZwU9Zvhj80RXXlkHTgUVGoi+sjF+YkdbXXPB0eTmF0SP4TO2E0QFRdpfDw=="
 }

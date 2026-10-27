@@ -37,12 +37,12 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 .hd.nw::after{top:0;left:0;border-top:3px solid transparent;border-left:3px solid transparent;border-radius:8px 0 0 0}
 .hd.se::after{bottom:0;right:0;border-bottom:3px solid transparent;border-right:3px solid transparent;border-radius:0 0 8px 0}
 .hd.sw::after{bottom:0;left:0;border-bottom:3px solid transparent;border-left:3px solid transparent;border-radius:0 0 0 8px}
-.grip{position:absolute;top:12px;left:50%;z-index:3;width:46px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:14px;line-height:1;color:#fff;background:rgba(14,16,20,.6);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(8px);cursor:grab;touch-action:none;opacity:0;transform:translate(-50%,-4px);transition:opacity .2s,transform .2s,background .15s}
+.grip{position:absolute;top:12px;left:50%;z-index:3;width:46px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:14px;line-height:1;color:#fff;background:rgba(14,16,20,.78);border:1px solid rgba(255,255,255,.1);cursor:grab;touch-action:none;opacity:0;transform:translate(-50%,-4px);transition:opacity .2s,transform .2s,background .15s}
 .grip:hover{background:rgba(91,140,255,.8)}
 .grip:active{cursor:grabbing}
-.x{position:absolute;top:12px;right:14px;z-index:5;width:26px;height:26px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:rgba(14,16,20,.6);backdrop-filter:blur(8px);color:#fff;font-size:16px;line-height:1;cursor:pointer;opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s,background .15s}
+.x{position:absolute;top:12px;right:14px;z-index:5;width:26px;height:26px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:rgba(14,16,20,.78);color:#fff;font-size:16px;line-height:1;cursor:pointer;opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s,background .15s}
 .x:hover{background:rgba(224,64,64,.92)}
-.ctl{position:absolute;left:14px;right:14px;bottom:14px;z-index:2;display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:12px;background:rgba(14,16,20,.62);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(10px);opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;cursor:default}
+.ctl{position:absolute;left:14px;right:14px;bottom:14px;z-index:2;display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:12px;background:rgba(14,16,20,.8);border:1px solid rgba(255,255,255,.08);opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;cursor:default}
 .tile:hover .grip{opacity:1;transform:translate(-50%,0)}
 .tile:hover .x,.x:focus-visible{opacity:1;transform:none}
 .tile:hover .ctl,.ctl:focus-within{opacity:1;transform:none}
@@ -91,6 +91,8 @@ body.drag #drop{display:flex}
 .cpane{display:flex;flex-direction:column;gap:6px}
 .crow{display:flex;justify-content:space-between;gap:12px;padding:10px;border-radius:10px;background:rgba(255,255,255,.04);font-size:13px}
 .crow span{color:var(--mute)}
+label.crow{align-items:center;cursor:pointer}
+.crow input{accent-color:var(--acc);width:16px;height:16px;cursor:pointer}
 .soon{margin:0;padding:6px 2px;font-size:13px;color:var(--mute)}
 #bar.open{opacity:1!important}
 #bar.show{opacity:.9}
@@ -214,10 +216,11 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 <div id="cfg" role="dialog" aria-label="Configurações" style="display:none">
   <div class="phd">Configurações</div>
   <div class="ctabs"><button type="button" data-t="geral" class="on">Geral</button><button type="button" data-t="perfil">Perfil</button><button type="button" data-t="atalhos">Atalhos</button></div>
-  <div class="cpane" data-p="geral"><div class="crow"><span>Versão do app</span><b id="cVer">—</b></div><div class="crow"><span>Última atualização</span><b id="cDate">—</b></div></div>
+  <div class="cpane" data-p="geral"><div class="crow"><span>Versão do app</span><b id="cVer">—</b></div><div class="crow"><span>Última atualização</span><b id="cDate">—</b></div><label class="crow"><span>Restaurar a última sessão ao abrir</span><input type="checkbox" id="optRestore" checked></label></div>
   <div class="cpane" data-p="perfil" style="display:none"><p class="soon">Em breve: perfil e preferências salvas.</p></div>
   <div class="cpane" data-p="atalhos" style="display:none">
     <div class="crow"><span>Desfazer</span><b>Ctrl+Z</b></div>
+    <div class="crow"><span>Refazer</span><b>Ctrl+Shift+Z</b></div>
     <div class="crow"><span>Colar arquivos</span><b>Ctrl+V</b></div>
     <div class="crow"><span>Remover a caixa selecionada</span><b>Delete</b></div>
     <div class="crow"><span>Pausar / retomar tudo</span><b>Espaço</b></div>
@@ -314,11 +317,28 @@ const tileByEl=new Map();
 const MODES=['auto','max','bal','eco'],MODE_LABEL={auto:'Auto',max:'Máximo',bal:'Equilibrado',eco:'Econômico'};
 let gPaused=false;
 let mode='max',budgetAuto=6,fps=60,peak=60,schedT=0;
+const MAX_PLAY=12,UNLOAD_MS=45000;
 const budget=()=>mode==='max'?Infinity:mode==='bal'?8:mode==='eco'?3:budgetAuto;
 const io=new IntersectionObserver(es=>{
-  es.forEach(e=>{const t=tileByEl.get(e.target);if(t)t.vis=e.isIntersecting});
+  es.forEach(e=>{const t=tileByEl.get(e.target);if(t){t.vis=e.isIntersecting;offscreen(t)}});
   schedule();
 },{root:wall,rootMargin:'150px'});
+// vídeos que ficam muito tempo fora da tela são descarregados da memória e voltam ao rolar
+function offscreen(t){
+  if(t.isImg||!t.v||!t.placed)return;
+  clearTimeout(t.unT);
+  if(t.vis){if(t.unloaded)reloadMedia(t)}
+  else t.unT=setTimeout(()=>unloadMedia(t),UNLOAD_MS);
+}
+function unloadMedia(t){
+  if(t.vis||t.unloaded||t.hidden||!t.v||!tiles.includes(t))return;
+  t.resumeT=t.v.currentTime||0;t.v.pause();t.v.removeAttribute('src');t.v.load();t.unloaded=true;
+}
+function reloadMedia(t){
+  const v=t.v;t.unloaded=false;
+  v.addEventListener('loadedmetadata',()=>{try{v.currentTime=t.resumeT||0}catch(e){}v.playbackRate=t.rate||1;schedule()},{once:true});
+  v.src=t.curUrl||t.url;v.load();
+}
 function schedule(){if(schedT)return;schedT=setTimeout(()=>{schedT=0;runSchedule()},60)}
 function runSchedule(){
   const vids=tiles.filter(t=>t.placed&&!t.isImg),now=performance.now();
@@ -333,7 +353,8 @@ function runSchedule(){
   };
   const cand=(document.hidden||gPaused)?[]:vids.filter(t=>t.vis).sort((a,b)=>score(b)-score(a));
   const B=budget(),play=new Set();let used=0;
-  for(const t of cand){if(play.size===0||used+t.cost<=B){play.add(t);used+=t.cost}}
+  const CAP=mode==='max'?MAX_PLAY:99;
+  for(const t of cand){if(play.size>=CAP)break;if(play.size===0||used+t.cost<=B){play.add(t);used+=t.cost}}
   vids.forEach(t=>{
     if(play.has(t)){if(t.v.paused)t.v.play().catch(()=>{})}
     else if(!t.v.paused)t.v.pause();
@@ -457,7 +478,7 @@ menu.addEventListener('contextmenu',e=>e.preventDefault());
 /* ---------- qualidade do vídeo (app desktop) ---------- */
 const QUALS=[1080,720,480,360,240];let qSeq=0;const qJobs=new Map();
 function applySrc(item,url){
-  const v=item.v,t=v.currentTime,pl=!v.paused,rt=item.rate||1;
+  const v=item.v,t=v.currentTime,pl=!v.paused,rt=item.rate||1;item.curUrl=url;item.unloaded=false;
   v.addEventListener('loadedmetadata',()=>{try{v.currentTime=t}catch(e){}v.playbackRate=rt;if(v.videoWidth&&v.videoHeight)item.cost=Math.max(.25,v.videoWidth*v.videoHeight/(1280*720));if(pl)v.play().catch(()=>{});schedule()},{once:true});
   if(item._qerr)v.removeEventListener('error',item._qerr);
   item._qerr=()=>{if(item.q&&url!==item.url){item.q=0;applySrc(item,item.url);qChip(item);toast('A cópia leve não abriu; voltei ao original.',3500)}};
@@ -620,8 +641,8 @@ function relinkFromFolder(list){
 }
 const ULBL={rect:'mover/redimensionar',view:'zoom/enquadramento',arr:'organizar tudo',add:'adicionar',rm:'remover',grp:'ação em grupo'};
 /* ---------- desfazer (Ctrl+Z) ---------- */
-const hist=[],HMAX=50;let hOff=0,hgrp=null;
-function hpush(e){if(hOff)return;if(hgrp){hgrp.push(e);return}hist.push(e);while(hist.length>HMAX)hfinal(hist.shift())}
+const hist=[],redoS=[],HMAX=50;let hOff=0,hgrp=null;
+function hpush(e){if(hOff)return;if(hgrp){hgrp.push(e);return}redoS.splice(0).forEach(hfinal);hist.push(e);while(hist.length>HMAX)hfinal(hist.shift())}
 function hgroup(fn){if(hgrp){fn();return}hgrp=[];try{fn()}finally{const g=hgrp;hgrp=null;if(g.length)hpush(g.length===1?g[0]:{t:'grp',list:g})}}
 function hfinal(e){
   if(e.t==='grp')e.list.forEach(hfinal);
@@ -630,18 +651,27 @@ function hfinal(e){
 function absOf(t){const W=cw();return{l:t.fx*W,t:t.fy*CH,w:t.fw*W,h:t.fh*CH}}
 function putAbs(t,a){if(a.t+a.h+GAP>CH)setCH(a.t+a.h+GAP);setRect(t,a.l,a.t,a.w,a.h)}
 function commitRect(item,a0,m0){const a=absOf(item);if(Math.abs(a.l-a0.l)+Math.abs(a.t-a0.t)+Math.abs(a.w-a0.w)+Math.abs(a.h-a0.h)>2)hpush({t:'rect',item,a:a0,manual:m0})}
-function hrev(e){
-  if(e.t==='grp'){for(let i=e.list.length-1;i>=0;i--)hrev(e.list[i]);return}
-  if(e.t==='rect'){putAbs(e.item,e.a);e.item.manual=e.manual}
-  else if(e.t==='view'){const i=e.item;i.px=e.px;i.py=e.py;i.z=e.z;if(i.apply)i.apply()}
-  else if(e.t==='arr'){setCH(e.CH);e.list.forEach(x=>{putAbs(x.item,x.a);x.item.manual=x.manual})}
-  else if(e.t==='add'){if(e.item.discard)e.item.discard()}
-  else if(e.t==='rm'){e.items.forEach(x=>x.item.restore(x.a,x.z))}
+// aplica uma entrada do histórico e devolve a entrada inversa (para desfazer/refazer)
+function hswap(e){
+  if(e.t==='grp'){const out=[];for(let i=e.list.length-1;i>=0;i--)out.push(hswap(e.list[i]));return{t:'grp',list:out}}
+  if(e.t==='rect'){const cur=absOf(e.item),m=e.item.manual;putAbs(e.item,e.a);e.item.manual=e.manual;return{t:'rect',item:e.item,a:cur,manual:m}}
+  if(e.t==='view'){const i=e.item,cur={t:'view',item:i,px:i.px,py:i.py,z:i.z};i.px=e.px;i.py=e.py;i.z=e.z;if(i.apply)i.apply();return cur}
+  if(e.t==='arr'){const cur={t:'arr',CH,list:e.list.map(x=>({item:x.item,a:absOf(x.item),manual:x.item.manual}))};setCH(e.CH);e.list.forEach(x=>{putAbs(x.item,x.a);x.item.manual=x.manual});return cur}
+  if(e.t==='add'){const items=(e.items||[{item:e.item}]).map(x=>({item:x.item,a:absOf(x.item),z:+x.item.el.style.zIndex||0}));items.forEach(x=>x.item.hide());return{t:'rm',items}}
+  if(e.t==='rm'){e.items.forEach(x=>x.item.restore(x.a,x.z));return{t:'add',items:e.items.map(x=>({item:x.item}))}}
+  return e;
 }
 function undo(){
   const e=hist.pop();if(!e){toast('Nada para desfazer',1400);return}
-  hOff++;try{hrev(e)}finally{hOff--}
+  let inv;hOff++;try{inv=hswap(e)}finally{hOff--}
+  redoS.push(inv);while(redoS.length>HMAX)hfinal(redoS.shift());
   refreshEmpty();fitCanvas();schedule();toast('Desfeito: '+(ULBL[e.t]||'ação'),1600);
+}
+function redo(){
+  const e=redoS.pop();if(!e){toast('Nada para refazer',1400);return}
+  let inv;hOff++;try{inv=hswap(e)}finally{hOff--}
+  hist.push(inv);
+  refreshEmpty();fitCanvas();schedule();toast('Refeito: '+(ULBL[inv.t]||'ação'),1600);
 }
 function killTile(t){
   if(t.qJob)cancelQ(t);
@@ -660,7 +690,7 @@ function clearUndoable(){
   refreshEmpty();fitCanvas();schedule();
 }
 function clearAll(){
-  hist.splice(0).forEach(hfinal);
+  hist.splice(0).forEach(hfinal);redoS.splice(0).forEach(hfinal);
   tiles.forEach(t=>{if(t.qJob)cancelQ(t);
     clearInterval(t.timer);io.unobserve(t.el);tileByEl.delete(t.el);
     if(!t.isImg&&t.v){t.v.pause();t.v.removeAttribute('src');t.v.load()}
@@ -906,7 +936,7 @@ function addVideo(f,opt){
   el.addEventListener('dblclick',e=>{if(e.target.closest('.ctl,.x,.hd,.grip'))return;vTouch();item.px=50;item.py=50;item.z=1;apply()});
 
   item.hide=()=>{
-    if(item.hidden)return;item.hidden=true;cancelQ(item);
+    if(item.hidden)return;item.hidden=true;cancelQ(item);clearTimeout(item.unT);
     tiles=tiles.filter(t=>t!==item);el.style.opacity='0';io.unobserve(el);tileByEl.delete(el);if(!isImg)v.pause();
     setTimeout(()=>{if(item.hidden)el.remove()},300);
   };
@@ -955,10 +985,12 @@ addEventListener('dragover',e=>e.preventDefault());
 addEventListener('dragleave',()=>{depth=Math.max(0,depth-1);if(!depth)document.body.classList.remove('drag')});
 addEventListener('drop',e=>{e.preventDefault();depth=0;document.body.classList.remove('drag');addFiles(e.dataTransfer.files)});
 addEventListener('keydown',e=>{
-  if(!(e.ctrlKey||e.metaKey)||e.shiftKey||e.altKey||e.key.toLowerCase()!=='z')return;
+  if(!(e.ctrlKey||e.metaKey)||e.altKey)return;
+  const k=e.key.toLowerCase(),isRedo=(k==='z'&&e.shiftKey)||k==='y';
+  if(!isRedo&&!(k==='z'&&!e.shiftKey))return;
   const t=e.target;
   if(t&&t.matches&&t.matches('textarea,[contenteditable],input:not([type=range]):not([type=color])'))return;
-  e.preventDefault();undo();
+  e.preventDefault();if(isRedo)redo();else undo();
 });
 addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;
@@ -998,6 +1030,41 @@ requestAnimationFrame(loop);
 CH=vh();canvas.style.height=CH+'px';
 new ResizeObserver(()=>tiles.forEach(applyRect)).observe(canvas);
 refreshEmpty();
+/* ---------- sessão (salvar e restaurar a parede) ---------- */
+const SKEY='ly:session',OKEY='ly:opt:restore',RKEY='ly:restoring';
+let lastSess='';
+function sessJson(){try{return JSON.stringify({tiles:snapshot()})}catch(e){return null}}
+function saveSessionNow(){
+  try{
+    if(tiles.some(t=>!t.placed))return;
+    const j=sessJson();if(j===null||j===lastSess)return;
+    lastSess=j;
+    if(tiles.length)localStorage.setItem(SKEY,JSON.stringify({saved:Date.now(),...JSON.parse(j)}));
+    else localStorage.removeItem(SKEY);
+  }catch(e){}
+}
+function restoreSession(){
+  try{
+    if(localStorage.getItem(OKEY)==='0')return;
+    if(localStorage.getItem(RKEY)==='1'){localStorage.removeItem(SKEY);localStorage.removeItem(RKEY);return}
+    const s=JSON.parse(localStorage.getItem(SKEY)||'null');
+    if(!s||!Array.isArray(s.tiles)||!s.tiles.length)return;
+    localStorage.setItem(RKEY,'1');
+    loadPreset(s);
+    localStorage.removeItem(RKEY);
+    toast('Sessão anterior restaurada ('+s.tiles.length+' itens)',2800);
+  }catch(e){try{localStorage.removeItem(SKEY);localStorage.removeItem(RKEY)}catch(_){}}
+}
+(function(){
+  const oc=document.getElementById('optRestore');
+  try{oc.checked=localStorage.getItem(OKEY)!=='0'}catch(e){}
+  oc.onchange=()=>{try{localStorage.setItem(OKEY,oc.checked?'1':'0')}catch(e){}};
+})();
+restoreSession();
+lastSess=sessJson()||'';
+setInterval(saveSessionNow,3000);
+addEventListener('pagehide',saveSessionNow);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSessionNow()});
 /* ---------- menu (engrenagem) ---------- */
 (function(){
   const bar=document.getElementById('bar'),g=document.getElementById('gear'),m=document.getElementById('menu');
@@ -1050,8 +1117,9 @@ refreshEmpty();
   function show(i){latest=i;b.textContent='\u2B07 Atualiza\u00e7\u00e3o '+i.version+' dispon\u00edvel';b.disabled=false;b.style.display='block'}
   b.onclick=async()=>{
     if(busy)return;
-    if(!await ask('Baixar e aplicar a atualização?\n\nA parede atual será fechada. Salve como preset antes, se quiser mantê-la.'+(latest&&latest.notes?'\n\nNovidades:\n'+latest.notes:''),'Atualizar'))return;
+    if(!await ask('Baixar e aplicar a atualização?\n\nSua parede é salva e restaurada logo depois (se a restauração estiver ligada nas Configurações).'+(latest&&latest.notes?'\n\nNovidades:\n'+latest.notes:''),'Atualizar'))return;
     busy=true;b.disabled=true;b.textContent='Baixando\u2026';
+    saveSessionNow();
     let r;try{r=await d.applyUpdate()}catch(e){r={ok:false}}
     if(r&&r.ok){b.textContent='Aplicando\u2026'}
     else{busy=false;b.disabled=false;b.textContent='Falhou \u2014 tentar de novo'}
