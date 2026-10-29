@@ -136,6 +136,30 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 #dlg .row{display:flex;justify-content:flex-end;gap:8px}
 #dlg button{padding:8px 14px;border-radius:8px;border:1px solid #2b2e35;background:#1a1d22;color:var(--fg);font-size:13px;cursor:pointer}
 #dlg button.ok{border-color:var(--acc);background:rgba(91,140,255,.22)}
+#metro{position:fixed;right:12px;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:99999;width:min(370px,calc(100vw - 24px));max-height:calc(100vh - 100px);overflow:auto;flex-direction:column;gap:10px;padding:12px;border-radius:14px;background:rgba(18,20,25,.97);border:1px solid rgba(255,255,255,.1);box-shadow:0 14px 36px rgba(0,0,0,.6)}
+#metro .phd{font-weight:600;font-size:14px}
+.met-row{display:flex;gap:10px;align-items:center}
+.met-stat{font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums;flex:1;min-width:0}
+.met-go{padding:9px 14px;border-radius:10px;border:1px solid var(--acc);background:rgba(91,140,255,.22);color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.met-go:hover{background:rgba(91,140,255,.4)}
+.met-f{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px}
+.met-f>span{color:var(--mute)}
+.met-inl{display:flex;gap:6px;align-items:center}
+.met-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.met-g label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mute)}
+#metro input[type=number],#metro input[type=text],#metro select{background:#14161a;color:var(--fg);border:1px solid #2b2e35;border-radius:8px;padding:6px 8px;font-size:13px;min-width:0}
+.met-f input[type=number],.met-f input[type=text],.met-f select{width:150px}
+.met-g input{width:100%}
+#metro input[type=range]{width:150px;accent-color:var(--acc)}
+#metro input[type=checkbox]{width:16px;height:16px;accent-color:var(--acc)}
+#metro button:not(.met-go){padding:6px 10px;border-radius:8px;border:1px solid #2b2e35;background:#1a1d22;color:var(--fg);font-size:12px;cursor:pointer}
+#metro button:not(.met-go):hover{border-color:var(--acc)}
+.met-hint{font-size:12px;color:var(--mute);line-height:1.45}
+.met-hr{border:0;border-top:1px solid rgba(255,255,255,.08);margin:2px 0;width:100%}
+.met-song{display:flex;flex-direction:column;gap:8px}
+#mviz{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:99997;width:min(460px,calc(100vw - 24px));border-radius:14px;background:rgba(14,16,20,.9);border:1px solid rgba(255,255,255,.1);overflow:hidden;display:none;touch-action:manipulation}
+#mviz canvas{display:block;width:100%;height:124px;cursor:pointer}
+#mviz button{position:absolute;top:6px;right:6px;width:26px;height:26px;padding:0;border-radius:8px;border:1px solid #2b2e35;background:rgba(14,16,20,.8);color:var(--fg);font-size:11px;cursor:pointer}
 .rate{position:absolute;top:12px;left:14px;z-index:2;font-size:11px;padding:3px 8px;border-radius:10px;background:rgba(14,16,20,.7);color:#fff;font-variant-numeric:tabular-nums;pointer-events:none}
 .rate{opacity:0;transition:opacity .15s}
 .tile:hover .rate{opacity:1}
@@ -211,6 +235,38 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 <input id="folderfile" type="file" webkitdirectory multiple hidden>
 <div id="ctxmenu" role="menu"></div>
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="metro" role="dialog" aria-label="Metrônomo" style="display:none">
+  <div class="phd">Metrônomo</div>
+  <div class="met-row"><button type="button" id="m_go" class="met-go">▶ Iniciar</button><div id="m_stat" class="met-stat">Parado</div></div>
+  <label class="met-f"><span>Modo</span><select id="m_mode" data-k="mode"><option value="const">Constante</option><option value="up">Crescente</option><option value="down">Decrescente</option><option value="waves">Ondas</option><option value="levels">Níveis aleatórios</option><option value="edge">Edge (rajadas)</option><option value="song">Seguir música</option></select></label>
+  <div class="met-hint" id="m_hint"></div>
+  <label class="met-f" data-m="const"><span>BPM</span><span class="met-inl"><input type="number" data-k="bpm" min="20" max="480" step="1"><button type="button" id="m_tap">Tap</button></span></label>
+  <div class="met-g" data-m="up down waves"><label>BPM mínimo<input type="number" data-k="lo" min="20" max="480"></label><label>BPM máximo<input type="number" data-k="hi" min="20" max="480"></label></div>
+  <label class="met-f" data-m="up down"><span>Duração da rampa (min)</span><input type="number" data-k="ramp" min="0.2" max="120" step="0.5"></label>
+  <label class="met-f" data-m="waves"><span>Período da onda (s)</span><input type="number" data-k="per" min="4" max="600"></label>
+  <label class="met-f" data-m="levels"><span>Velocidades (BPM)</span><input type="text" data-k="lv" placeholder="50, 120, 180, 330" maxlength="60"></label>
+  <div class="met-g" data-m="levels"><label>Cada trecho: mín (s)<input type="number" data-k="dmin" min="3" max="600"></label><label>máx (s)<input type="number" data-k="dmax" min="3" max="600"></label></div>
+  <div class="met-g" data-m="edge"><label>BPM base<input type="number" data-k="base" min="20" max="480"></label><label>BPM do pico<input type="number" data-k="peak" min="20" max="480"></label></div>
+  <div class="met-g" data-m="edge"><label>Pico dura: mín (s)<input type="number" data-k="pkmin" min="2" max="300"></label><label>máx (s)<input type="number" data-k="pkmax" min="2" max="300"></label></div>
+  <div class="met-g" data-m="edge"><label>Entre picos: mín (s)<input type="number" data-k="gmin" min="3" max="900"></label><label>máx (s)<input type="number" data-k="gmax" min="3" max="900"></label></div>
+  <div class="met-song" data-m="song">
+    <div class="met-row"><button type="button" id="m_pick">Escolher música…</button><span id="m_songinfo" class="met-hint">Nenhuma música escolhida</span></div>
+    <label class="met-f"><span>Batidas</span><select data-k="mult"><option value="1">Normais</option><option value="0.5">Metade (÷2)</option><option value="2">Dobro (×2)</option></select></label>
+    <label class="met-f"><span>Clicar nas batidas</span><input type="checkbox" data-k="songClick"></label>
+    <label class="met-f"><span>Volume do clique</span><input type="range" min="0" max="1" step="0.05" data-k="clickVol"></label>
+    <label class="met-f"><span>Volume da música</span><input type="range" min="0" max="1" step="0.05" data-k="songVol"></label>
+    <label class="met-f"><span>Ajuste fino (ms)</span><input type="range" min="-250" max="250" step="5" data-k="offset"></label>
+    <div class="met-hint">A música toca junto com as batidas. Clique na barra de progresso do visualizador para ir a outro ponto.</div>
+  </div>
+  <hr class="met-hr">
+  <div class="met-g"><label>Duração total (min, 0 = sem fim)<input type="number" data-k="total" min="0" max="600" step="0.5"></label><label>Acento a cada (batidas)<input type="number" data-k="accent" min="0" max="16"></label></div>
+  <label class="met-f"><span>Som</span><select data-k="sound"><option value="click">Clique</option><option value="wood">Madeira</option><option value="bip">Bip</option><option value="tambor">Tambor</option></select></label>
+  <label class="met-f" data-m="const up down waves levels edge"><span>Volume</span><input type="range" min="0" max="1" step="0.05" data-k="vol"></label>
+  <label class="met-f"><span>Visualizador</span><select data-k="view"><option value="pista">Pista de ritmo</option><option value="pulso">Pulso</option><option value="off">Só som</option></select></label>
+  <div class="met-hint">Atalho: B inicia e para o metrônomo.</div>
+</div>
+<input id="metrofile" type="file" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac" hidden>
+<div id="mviz"><canvas id="mcv"></canvas><button type="button" id="m_x" title="Parar" aria-label="Parar metrônomo">■</button></div>
 <div id="dlg" role="dialog" aria-modal="true"><div class="box"><p></p><div class="row"><button type="button" class="no">Cancelar</button><button type="button" class="ok">OK</button></div></div></div>
 <div id="drop">Solte para adicionar à parede</div>
 <div id="cfg" role="dialog" aria-label="Configurações" style="display:none">
@@ -226,10 +282,11 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
     <div class="crow"><span>Pausar / retomar tudo</span><b>Espaço</b></div>
     <div class="crow"><span>Silenciar tudo</span><b>M</b></div>
     <div class="crow"><span>Tela cheia na caixa selecionada</span><b>F</b></div>
+    <div class="crow"><span>Iniciar / parar o metrônomo</span><b>B</b></div>
   </div>
 </div>
 <button id="upd" type="button"></button>
-<div id="bar"><div id="menu"><span id="hud" style="display:none"></span><button id="perf" type="button">Desempenho: Máximo</button><button id="add" type="button">Adicionar mídia</button><button id="addtext" type="button">Adicionar texto</button><button id="presetsBtn" type="button">Presets</button><button id="arrange" type="button">Organizar tudo</button><button id="clear" type="button">Limpar parede</button><button id="cfgBtn" type="button">Configurações</button></div><button id="gear" type="button" aria-label="Menu" aria-expanded="false"><span class="g1">⚙</span><span class="g2">✕</span></button></div>
+<div id="bar"><div id="menu"><span id="hud" style="display:none"></span><button id="perf" type="button">Desempenho: Máximo</button><button id="add" type="button">Adicionar mídia</button><button id="addtext" type="button">Adicionar texto</button><button id="presetsBtn" type="button">Presets</button><button id="arrange" type="button">Organizar tudo</button><button id="clear" type="button">Limpar parede</button><button id="metroBtn" type="button">Metrônomo</button><button id="cfgBtn" type="button">Configurações</button></div><button id="gear" type="button" aria-label="Menu" aria-expanded="false"><span class="g1">⚙</span><span class="g2">✕</span></button></div>
 <input id="file" type="file" accept="video/*,image/*,.mkv,.mov,.mp4,.webm,.gif,.avif" multiple hidden>
 <script>
 const wall=document.getElementById('wall'),empty=document.getElementById('empty'),file=document.getElementById('file');
@@ -1030,6 +1087,374 @@ requestAnimationFrame(loop);
 CH=vh();canvas.style.height=CH+'px';
 new ResizeObserver(()=>tiles.forEach(applyRect)).observe(canvas);
 refreshEmpty();
+/* ---------- metrônomo ---------- */
+const METKEY='ly:metro';
+const MET_DEF={mode:'const',bpm:120,lo:60,hi:180,ramp:5,per:60,lv:'50, 120, 180, 330',dmin:20,dmax:60,base:90,peak:220,pkmin:8,pkmax:20,gmin:30,gmax:90,total:0,accent:4,sound:'click',vol:.6,view:'pista',mult:1,songClick:true,clickVol:.5,songVol:.8,offset:0};
+const MET={p:{...MET_DEF},ac:null,master:null,songGain:null,cg:null,running:false,timer:0,raf:0,q:[],seq:0,endAt:0,song:null,sg:null,src:null,prog:null};
+const MET_LAG=-0.010; // compensação (s) do atraso do detector de batidas
+const mClamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const mNum=(v,d)=>(v!==''&&v!==null&&Number.isFinite(+v))?+v:d;
+const mFmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const mEl=id=>document.getElementById(id);
+function metLoad(){try{const s=JSON.parse(localStorage.getItem(METKEY)||'null');if(s&&typeof s==='object')for(const k in MET_DEF){if(k in s&&typeof s[k]===typeof MET_DEF[k])MET.p[k]=s[k]}}catch(e){}}
+function metSave(){try{localStorage.setItem(METKEY,JSON.stringify(MET.p))}catch(e){}}
+function metAC(){
+  if(!MET.ac){
+    const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;
+    try{MET.ac=new AC()}catch(e){return null}
+    MET.master=MET.ac.createGain();MET.master.connect(MET.ac.destination);
+    MET.songGain=MET.ac.createGain();MET.songGain.connect(MET.ac.destination);
+  }
+  if(MET.ac.state==='suspended')MET.ac.resume();
+  return MET.ac;
+}
+/* programa de andamento: trechos (segments) gerados sob demanda */
+function metProgram(p){
+  const rnd=(a,b)=>a+Math.random()*Math.max(0,b-a);
+  const B=v=>mClamp(mNum(v,120),20,480);
+  const levels=String(p.lv).split(/[^0-9.]+/).map(Number).filter(n=>n>=20&&n<=480);
+  if(!levels.length)levels.push(120);
+  const dmin=Math.max(3,mNum(p.dmin,20)),dmax=Math.max(dmin,mNum(p.dmax,60));
+  const gmin=Math.max(3,mNum(p.gmin,30)),gmax=Math.max(gmin,mNum(p.gmax,90));
+  const pmin=Math.max(2,mNum(p.pkmin,8)),pmax=Math.max(pmin,mNum(p.pkmax,20));
+  const segs=[];let ci=0;
+  const gen=()=>{
+    const last=segs[segs.length-1],t0=last?last.t1:0;
+    switch(p.mode){
+      case 'up':case 'down':{
+        if(last&&last.k==='hold')return null;
+        if(last)return{t0,t1:Infinity,k:'hold',a:last.b};
+        const up=p.mode==='up',lo=B(p.lo),hi=B(p.hi);
+        return{t0,t1:t0+Math.max(5,mNum(p.ramp,5)*60),k:'ramp',a:up?lo:hi,b:up?hi:lo};
+      }
+      case 'waves':return last?null:{t0,t1:Infinity,k:'sine',a:B(Math.min(p.lo,p.hi)),b:B(Math.max(p.lo,p.hi)),P:Math.max(4,mNum(p.per,60))};
+      case 'levels':{
+        let l;do{l=levels[Math.floor(Math.random()*levels.length)]}while(levels.length>1&&last&&B(l)===last.a);
+        return{t0,t1:t0+rnd(dmin,dmax),k:'hold',a:B(l)};
+      }
+      case 'edge':{
+        if(!last||last.peak)return{t0,t1:t0+rnd(gmin,gmax),k:'hold',a:B(p.base),peak:false};
+        return{t0,t1:t0+rnd(pmin,pmax),k:'hold',a:B(p.peak),peak:true};
+      }
+      default:return last?null:{t0,t1:Infinity,k:'hold',a:B(p.bpm)};
+    }
+  };
+  const ensure=t=>{while(!segs.length||segs[segs.length-1].t1<=t){const s=gen();if(!s)break;segs.push(s)}};
+  const val=(s,t)=>s.k==='hold'?s.a:s.k==='ramp'?s.a+(s.b-s.a)*mClamp((t-s.t0)/(s.t1-s.t0),0,1):(s.a+s.b)/2-(s.b-s.a)/2*Math.cos(2*Math.PI*(t-s.t0)/s.P);
+  const seg=t=>{ensure(t);while(ci<segs.length-1&&segs[ci].t1<=t)ci++;while(ci>0&&segs[ci].t0>t)ci--;return segs[ci]};
+  return{bpmAt:t=>val(seg(t),t),info:t=>{const s=seg(t);return{bpm:val(s,t),left:s.t1-t,peak:!!s.peak,k:s.k}}};
+}
+/* som */
+function metClick(t,accent,bpm,vol){
+  const ac=MET.ac,p=MET.p,o=ac.createOscillator(),g=ac.createGain();
+  const len=Math.min(0.09,0.5*60/Math.max(30,bpm));
+  const base={click:1000,wood:800,bip:660,tambor:140}[p.sound]||1000,f=base*(accent?1.5:1);
+  o.type=p.sound==='click'?'square':p.sound==='wood'?'triangle':'sine';
+  o.frequency.setValueAtTime(f,t);
+  if(p.sound==='wood'||p.sound==='tambor')o.frequency.exponentialRampToValueAtTime(f*0.5,t+len);
+  const v=Math.max(0.0002,(accent?1:0.7)*vol*(p.sound==='click'?0.45:1));
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+0.003);g.gain.exponentialRampToValueAtTime(0.0001,t+len);
+  o.connect(g);g.connect(MET.cg||MET.master);o.start(t);o.stop(t+len+0.02);
+}
+/* fila de batidas (visual e áudio) */
+function metFill(now){
+  const horizon=now+2.7,p=MET.p;
+  if(p.mode==='song'){
+    const S=MET.sg;if(!S)return;
+    while(S.i<S.beats.length){
+      const bt=S.t0+S.beats[S.i]+p.offset/1000;
+      if(bt>horizon)break;
+      const lo=Math.max(0,S.i-2),hi=Math.min(S.beats.length-1,S.i+3),loc=hi>lo?60*(hi-lo)/(S.beats[hi]-S.beats[lo]):120;
+      MET.q.push({id:MET.seq++,t:bt,accent:p.accent>1&&S.i%p.accent===0,bpm:mClamp(loc,20,480),s:false});S.i++;
+    }
+    return;
+  }
+  while(MET.nextT<horizon&&!MET.endAt){
+    const rel=MET.nextT-MET.t0;
+    if(rel>=MET.total){MET.endAt=MET.nextT;break}
+    const bpm=MET.prog.bpmAt(rel);
+    MET.q.push({id:MET.seq++,t:MET.nextT,accent:p.accent>1&&MET.idx%p.accent===0,bpm,s:false});
+    MET.idx++;MET.nextT+=60/bpm;
+  }
+}
+let metUiAt=0;
+function metTick(){
+  if(!MET.running)return;
+  const ac=MET.ac,now=ac.currentTime,p=MET.p;
+  metFill(now);
+  const clickOn=p.mode!=='song'||p.songClick,vol=p.mode==='song'?p.clickVol:p.vol;
+  for(const it of MET.q){
+    if(it.s||it.t>now+0.35)continue;
+    it.s=true;
+    if(it.t>=now-0.04&&clickOn)metClick(Math.max(it.t,now),it.accent,it.bpm,vol);
+  }
+  while(MET.q.length&&MET.q[0].t<now-1.5)MET.q.shift();
+  if(MET.endAt&&now>MET.endAt+0.4){metStop('Tempo total concluído.');return}
+  const nt=performance.now();if(nt-metUiAt>250){metUiAt=nt;metUI()}
+}
+function metStart(){
+  const ac=metAC();if(!ac){toast('Este navegador não consegue tocar áudio.');return false}
+  const p=MET.p;
+  if(p.mode==='song'&&!(MET.song&&MET.song.beats&&MET.song.beats.length)){toast('Escolha uma música primeiro.');return false}
+  if(MET.running)metStop();
+  MET.running=true;MET.q.length=0;MET.endAt=0;MET.seq=0;MET.sg=null;MET.src=null;
+  MET.cg=ac.createGain();MET.cg.connect(MET.master);
+  const t0=ac.currentTime+0.2;
+  if(p.mode==='song'){
+    let b=MET.song.beats;
+    if(p.mult===0.5)b=b.filter((_,i)=>i%2===0);
+    else if(p.mult===2){const o=[];for(let i=0;i<b.length;i++){o.push(b[i]);if(i+1<b.length)o.push((b[i]+b[i+1])/2)}b=o}
+    MET.sg={beats:b,i:0,t0};
+    const src=ac.createBufferSource();src.buffer=MET.song.buf;MET.songGain.gain.value=p.songVol;src.connect(MET.songGain);
+    src.onended=()=>{if(MET.src===src)metStop('A música terminou.')};
+    src.start(t0);MET.src=src;
+  }else{
+    MET.prog=metProgram(p);MET.t0=t0;MET.nextT=t0;MET.idx=0;MET.total=p.total>0?p.total*60:Infinity;
+  }
+  MET.timer=setInterval(metTick,40);metTick();metUI();metShowViz();metLoop();
+  return true;
+}
+function metStop(msg){
+  if(!MET.running)return;
+  MET.running=false;clearInterval(MET.timer);cancelAnimationFrame(MET.raf);
+  if(MET.src){const s=MET.src;MET.src=null;s.onended=null;try{s.stop()}catch(e){}try{s.disconnect()}catch(e){}}
+  if(MET.cg){try{MET.cg.disconnect()}catch(e){}MET.cg=null}
+  MET.q.length=0;MET.endAt=0;
+  if(msg)toast(msg,2500);
+  metUI();metShowViz();
+}
+function metSeek(sec){
+  if(!MET.running||MET.p.mode!=='song'||!MET.sg||!MET.song)return;
+  const ac=MET.ac,S=MET.sg;sec=mClamp(sec,0,Math.max(0,MET.song.buf.duration-0.5));
+  const old=MET.src;MET.src=null;if(old){old.onended=null;try{old.stop()}catch(e){}try{old.disconnect()}catch(e){}}
+  const t=ac.currentTime+0.1;S.t0=t-sec;S.i=0;while(S.i<S.beats.length&&S.beats[S.i]<sec)S.i++;
+  MET.q.length=0;
+  const src=ac.createBufferSource();src.buffer=MET.song.buf;src.connect(MET.songGain);
+  src.onended=()=>{if(MET.src===src)metStop('A música terminou.')};
+  src.start(t,sec);MET.src=src;metUI();
+}
+function metRestartProg(){
+  const now=MET.ac.currentTime;
+  MET.q=MET.q.filter(it=>it.s||it.t<now);
+  MET.prog=metProgram(MET.p);MET.t0=now+0.1;MET.nextT=MET.t0;MET.idx=0;MET.endAt=0;
+  MET.total=MET.p.total>0?MET.p.total*60:Infinity;
+}
+/* visualizador */
+function metSize(){
+  const cv=mEl('mcv'),r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  const w=Math.max(200,Math.round(r.width||440)),h=Math.round(r.height||124);
+  cv.width=w*dpr;cv.height=h*dpr;MET.cw=w;MET.ch=h;
+  MET.cx=cv.getContext?cv.getContext('2d'):null;if(MET.cx)MET.cx.setTransform(dpr,0,0,dpr,0,0);
+}
+function metShowViz(){
+  const v=mEl('mviz'),on=MET.running&&MET.p.view!=='off';
+  v.style.display=on?'block':'none';
+  if(on)metSize();
+}
+function metLoop(){
+  cancelAnimationFrame(MET.raf);
+  const f=()=>{if(!MET.running)return;if(MET.p.view!=='off')metDraw();MET.raf=requestAnimationFrame(f)};
+  MET.raf=requestAnimationFrame(f);
+}
+function metCurBpm(now){let cur=null;for(const it of MET.q){if(it.t<=now+0.05)cur=it;else break}return cur?cur.bpm:(MET.q[0]?MET.q[0].bpm:0)}
+const MET_MODE={const:'Constante',up:'Crescente',down:'Decrescente',waves:'Ondas',levels:'Níveis aleatórios',edge:'Edge',song:'Música'};
+const metLat=()=>{const ac=MET.ac;return mClamp((ac&&(ac.outputLatency||ac.baseLatency))||0,0,0.25)};
+function metDraw(){
+  const c=MET.cx;if(!c||!MET.running)return;
+  const W=MET.cw,H=MET.ch,p=MET.p,now=MET.ac.currentTime-metLat(),song=p.mode==='song'&&MET.sg&&MET.song;
+  c.clearRect(0,0,W,H);
+  const area=song?H-26:H,bpm=metCurBpm(now);
+  let lastBeat=null;for(const it of MET.q){if(it.t<=now)lastBeat=it;else break}
+  const age=lastBeat?now-lastBeat.t:9;
+  c.textBaseline='alphabetic';
+  // legenda: nome da música ou modo, e aviso de pico no Edge
+  c.textAlign='left';c.font='12px system-ui,sans-serif';c.fillStyle='#9aa0a6';
+  let sub=song?'♪ '+MET.song.name.replace(/\.[^.]+$/,'').slice(0,42):(MET_MODE[p.mode]||'');
+  c.fillText(sub,12,p.view==='pulso'?20:44);
+  if(!song&&p.mode==='edge'&&MET.prog&&MET.prog.info(Math.max(0,now-MET.t0)).peak){c.textAlign='right';c.font='700 12px system-ui,sans-serif';c.fillStyle='#f472b6';c.fillText('PICO',W-40,20)}
+  if(p.view==='pulso'){
+    const cx=W/2,cy=area/2+12,k=Math.max(0,1-age/0.3);
+    c.beginPath();c.arc(cx,cy,28+22*k,0,6.2832);c.fillStyle=`rgba(${lastBeat&&lastBeat.accent?'244,114,182':'138,180,248'},${.18+.5*k})`;c.fill();
+    if(age<0.6){c.beginPath();c.arc(cx,cy,30+age*150,0,6.2832);c.strokeStyle=`rgba(255,255,255,${.5*(1-age/0.6)})`;c.lineWidth=2;c.stroke()}
+    c.fillStyle='#e8eaed';c.font='700 26px system-ui,sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(String(Math.round(bpm)),cx,cy-2);
+    c.font='11px system-ui,sans-serif';c.fillStyle='#9aa0a6';c.fillText('BPM',cx,cy+16);c.textBaseline='alphabetic';
+  }else{
+    const X0=64,Y=Math.round(area*0.68),look=2.4,speed=(W-X0-14)/look;
+    c.fillStyle='#e8eaed';c.textAlign='left';c.font='700 18px system-ui,sans-serif';c.fillText(Math.round(bpm)+' BPM',12,26);
+    c.strokeStyle='rgba(255,255,255,.10)';c.lineWidth=2;c.beginPath();c.moveTo(0,Y);c.lineTo(W,Y);c.stroke();
+    let pulse=0;for(const it of MET.q){const a=now-it.t;if(a>=0&&a<0.18)pulse=Math.max(pulse,1-a/0.18)}
+    c.lineWidth=3;c.strokeStyle=`rgba(255,255,255,${.3+.55*pulse})`;c.beginPath();c.arc(X0,Y,20+6*pulse,0,6.2832);c.stroke();
+    for(const it of MET.q){
+      const dt=it.t-now;if(dt<-0.25||dt>look)continue;
+      const x=X0+dt*speed,r=it.accent?14:10,fade=dt<0?Math.max(0,1+dt/0.25):Math.min(1,(look-dt)/0.3);
+      c.globalAlpha=fade;c.fillStyle=it.accent?'#f472b6':'#8ab4f8';
+      c.beginPath();c.arc(x,Y,r,0,6.2832);c.fill();
+    }
+    c.globalAlpha=1;
+  }
+  if(song){ // tempo e barra de progresso da música (clique para pular)
+    const dur=MET.song.buf.duration,pos=mClamp(now-MET.sg.t0,0,dur),x0=12,x1=W-12,y=H-10;
+    c.fillStyle='rgba(255,255,255,.14)';c.fillRect(x0,y,x1-x0,4);
+    c.fillStyle='#8ab4f8';c.fillRect(x0,y,(x1-x0)*pos/dur,4);
+    c.beginPath();c.arc(x0+(x1-x0)*pos/dur,y+2,5,0,6.2832);c.fillStyle='#e8eaed';c.fill();
+    c.font='11px system-ui,sans-serif';c.fillStyle='#9aa0a6';c.textAlign='left';c.fillText(mFmt(pos),x0,H-16);c.textAlign='right';c.fillText(mFmt(dur),x1,H-16);
+  }
+}
+/* análise de batidas de uma música (sem rede, tudo local) */
+async function metAnalyze(buf,progress){return metAnalyzePCM(buf.getChannelData(0),buf.numberOfChannels>1?buf.getChannelData(1):null,buf.sampleRate,progress)}
+async function metAnalyzePCM(ch0,ch1,sr,progress){
+  const yieldUi=()=>new Promise(r=>setTimeout(r,0));
+  const D=Math.max(1,Math.round(sr/12000)),sr2=sr/D,n=Math.floor(ch0.length/D),x=new Float32Array(n);
+  for(let i=0;i<n;i++){let s=0;const b=i*D;for(let k=0;k<D;k++)s+=ch1?(ch0[b+k]+ch1[b+k])*0.5:ch0[b+k];x[i]=s/D}
+  const N=512,HOP=128,frames=Math.max(0,Math.floor((n-N)/HOP)+1);
+  if(frames<400)return{beats:[],bpm:0};
+  const win=new Float32Array(N),cosT=new Float32Array(N/2),sinT=new Float32Array(N/2),rev=new Uint16Array(N);
+  for(let i=0;i<N;i++)win[i]=0.5-0.5*Math.cos(2*Math.PI*i/(N-1));
+  for(let i=0;i<N/2;i++){cosT[i]=Math.cos(2*Math.PI*i/N);sinT[i]=-Math.sin(2*Math.PI*i/N)}
+  for(let i=0;i<N;i++){let r=0,v=i;for(let b=0;b<9;b++){r=(r<<1)|(v&1);v>>=1}rev[i]=r}
+  const re=new Float32Array(N),im=new Float32Array(N);
+  const fft=()=>{for(let size=2;size<=N;size<<=1){const half=size>>1,step=N/size;for(let i=0;i<N;i+=size){for(let j=0,k=0;j<half;j++,k+=step){const a=i+j,b=a+half,tr=re[b]*cosT[k]-im[b]*sinT[k],ti=re[b]*sinT[k]+im[b]*cosT[k];re[b]=re[a]-tr;im[b]=im[a]-ti;re[a]+=tr;im[a]+=ti}}}};
+  const bins=Math.min(N/2-1,Math.floor(4000/(sr2/N)));
+  const prev=new Float32Array(bins+1),env=new Float32Array(frames);
+  for(let f=0;f<frames;f++){
+    const o=f*HOP;
+    for(let i=0;i<N;i++){re[rev[i]]=x[o+i]*win[i];im[rev[i]]=0}
+    fft();
+    let flux=0;
+    for(let k=1;k<=bins;k++){const m=Math.log(1+60*Math.sqrt(re[k]*re[k]+im[k]*im[k])),d=m-prev[k];if(d>0)flux+=d;prev[k]=m}
+    env[f]=flux;
+    if(f%500===499){if(progress)progress(0.8*f/frames);await yieldUi()}
+  }
+  const fr=sr2/HOP,mw=Math.max(3,Math.round(0.4*fr));
+  const cs=new Float64Array(frames+1);for(let i=0;i<frames;i++)cs[i+1]=cs[i]+env[i];
+  const o2=new Float32Array(frames);let sum=0,sum2=0;
+  for(let i=0;i<frames;i++){const a=Math.max(0,i-mw),b=Math.min(frames,i+mw+1),mean=(cs[b]-cs[a])/(b-a),v=Math.max(0,env[i]-mean);o2[i]=v;sum+=v;sum2+=v*v}
+  const mu=sum/frames,sd=Math.sqrt(Math.max(1e-9,sum2/frames-mu*mu));
+  for(let i=0;i<frames;i++)o2[i]/=sd;
+  // andamento local (janelas de 8 s)
+  const WLEN=Math.round(8*fr),WHOP=Math.round(2*fr),minL=Math.floor(fr*60/200),maxL=Math.ceil(fr*60/55);
+  const per=[],cent=[];
+  for(let s=0;;s+=WHOP){
+    const e=Math.min(frames,s+WLEN),A=new Float32Array(maxL*2+2);
+    for(let L=minL;L<=maxL*2&&L<e-s-10;L++){let acc=0;for(let i=s;i+L<e;i++)acc+=o2[i]*o2[i+L];A[L]=acc/(e-s-L)}
+    let bestL=minL,bestS=-1;
+    for(let L=minL;L<=maxL;L++){const bpm=60*fr/L,prior=Math.exp(-0.5*Math.pow(Math.log2(bpm/118),2)),sc=(A[L]+0.5*A[2*L]+0.25*(A[Math.round(L/2)]||0))*prior;if(sc>bestS){bestS=sc;bestL=L}}
+    let lag=bestL;if(bestL>minL&&bestL<maxL){const a=A[bestL-1],b=A[bestL],c=A[bestL+1],d=a-2*b+c;if(d<0)lag=bestL+0.5*(a-c)/d}
+    per.push(lag);cent.push(s+(e-s)/2);
+    if(s+WLEN>=frames)break;
+  }
+  const med=per.map((_,i)=>{const a=[per[Math.max(0,i-1)],per[i],per[Math.min(per.length-1,i+1)]].sort((p,q)=>p-q);return a[1]});
+  const P=new Float32Array(frames);let wi=0;
+  for(let f=0;f<frames;f++){
+    while(wi<cent.length-2&&cent[wi+1]<f)wi++;
+    const w1=Math.min(wi+1,cent.length-1),c0=cent[wi],c1=cent[w1],u=c1>c0?mClamp((f-c0)/(c1-c0),0,1):0;
+    P[f]=med[wi]*(1-u)+med[w1]*u;
+  }
+  // programação dinâmica (Ellis): melhor sequência de batidas
+  const C=new Float32Array(frames),Bk=new Int32Array(frames).fill(-1),LAM=300;
+  for(let i=0;i<frames;i++){
+    const p=P[i],lo=Math.max(0,i-Math.ceil(2*p)),hi=i-Math.max(1,Math.floor(p/2));
+    let bs=-Infinity,bj=-1;
+    for(let j=lo;j<=hi;j++){const r=Math.log((i-j)/p),v=C[j]-LAM*r*r;if(v>bs){bs=v;bj=j}}
+    if(bj>=0&&bs>0){C[i]=o2[i]+bs;Bk[i]=bj}else C[i]=o2[i];
+    if(i%3000===2999){if(progress)progress(0.8+0.2*i/frames);await yieldUi()}
+  }
+  let end=frames-1,bv=-1;for(let i=Math.max(0,frames-Math.ceil(2*P[frames-1])-1);i<frames;i++){if(C[i]>bv){bv=C[i];end=i}}
+  const bf=[];for(let i=end;i>=0;i=Bk[i]){bf.push(i);if(Bk[i]<0)break}
+  bf.reverse();
+  const beats=[];
+  for(const f of bf){const m=Math.max(o2[Math.max(0,f-1)],o2[f],o2[Math.min(frames-1,f+1)]);if(m>0.1)beats.push(Math.max(0,(f*HOP+N/2)/sr2-MET_LAG))}
+  return{beats,bpm:beats.length>1?60*(beats.length-1)/(beats[beats.length-1]-beats[0]):0};
+}
+async function metLoadSong(file){
+  const info=mEl('m_songinfo');
+  if(file.size>40*1024*1024){info.textContent='Arquivo grande demais (máx. 40 MB).';toast('Arquivo de áudio grande demais (máx. 40 MB).');return}
+  const ac=metAC();if(!ac){toast('Este navegador não consegue tocar áudio.');return}
+  info.textContent='Lendo o arquivo…';
+  let buf;try{const ab=file.arrayBuffer?await file.arrayBuffer():await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsArrayBuffer(file)});buf=await ac.decodeAudioData(ab)}catch(e){info.textContent='Não consegui ler esse áudio.';toast('Não consegui ler esse arquivo de áudio.');return}
+  if(buf.duration>900){info.textContent='Música longa demais (máx. 15 min).';toast('Música longa demais (máx. 15 min).');return}
+  info.textContent='Analisando as batidas…';
+  let r;try{r=await metAnalyze(buf,f=>{info.textContent='Analisando as batidas… '+Math.round(f*100)+'%'})}catch(e){info.textContent='A análise falhou.';return}
+  if(!r.beats.length){info.textContent='Não encontrei batidas claras nessa música.';return}
+  if(MET.running)metStop();
+  MET.song={name:file.name,buf,beats:r.beats,bpm:r.bpm};
+  info.textContent=file.name.slice(0,34)+' · ~'+Math.round(r.bpm)+' BPM · '+r.beats.length+' batidas';
+  metUI();
+}
+/* interface */
+const MET_HINT={const:'Batida fixa. Use Tap para marcar o ritmo de uma música que você está ouvindo.',up:'A velocidade sobe aos poucos do BPM mínimo ao máximo e depois se mantém.',down:'A velocidade desce aos poucos do BPM máximo ao mínimo e depois se mantém.',waves:'A velocidade sobe e desce em ondas entre o mínimo e o máximo.',levels:'Trechos aleatórios em velocidades diferentes, com trocas bruscas, como num desafio.',edge:'Ritmo base com rajadas rápidas e curtas, em intervalos aleatórios.',song:'Acompanha as batidas de uma música em arquivo (mp3, wav, ogg, m4a...).'};
+function metVis(){
+  const m=MET.p.mode;
+  document.querySelectorAll('#metro [data-m]').forEach(el=>{el.style.display=el.dataset.m.split(' ').includes(m)?'':'none'});
+  mEl('m_hint').textContent=MET_HINT[m]||'';
+}
+function metUI(){
+  const go=mEl('m_go'),st=mEl('m_stat');if(!go)return;
+  go.textContent=MET.running?'■ Parar':'▶ Iniciar';
+  if(!MET.running){st.textContent=MET.p.mode==='song'&&MET.song?'Pronto':'Parado';return}
+  const now=MET.ac.currentTime;let txt;
+  if(MET.p.mode==='song'&&MET.sg)txt=Math.round(metCurBpm(now))+' BPM · '+mFmt(now-MET.sg.t0)+' / '+mFmt(MET.song.buf.duration);
+  else{const i=MET.prog.info(Math.max(0,now-MET.t0));txt=Math.round(i.bpm)+' BPM'+(isFinite(i.left)?' · muda em '+Math.ceil(i.left)+' s':'')+(isFinite(MET.total)?' · restam '+mFmt(MET.total-(now-MET.t0)):'')}
+  st.textContent=txt;
+}
+function metChanged(k){
+  metSave();metVis();
+  if(!MET.running)return;
+  const p=MET.p;
+  if(k==='mode'){if(p.mode==='song'&&!MET.song){metStop();toast('Escolha uma música para esse modo.')}else metStart();return}
+  if(k==='view'){metShowViz();return}
+  if(k==='songVol'){if(MET.songGain)MET.songGain.gain.value=p.songVol;return}
+  if(p.mode!=='song'&&['bpm','lo','hi','ramp','per','lv','dmin','dmax','base','peak','pkmin','pkmax','gmin','gmax','total'].includes(k))metRestartProg();
+}
+const metTaps=[];
+function metBind(){
+  const P=MET.p;
+  document.querySelectorAll('#metro [data-k]').forEach(el=>{
+    const k=el.dataset.k,v=P[k];
+    if(el.type==='checkbox')el.checked=!!v;else el.value=String(v);
+    const read=()=>{
+      if(el.type==='checkbox')P[k]=el.checked;
+      else if(typeof MET_DEF[k]==='number'){
+        const lo=el.min!==''?+el.min:-1e9,hi=el.max!==''?+el.max:1e9;
+        P[k]=mClamp(mNum(el.value,MET_DEF[k]),lo,hi);
+      }else P[k]=el.value;
+      metChanged(k);
+    };
+    el.addEventListener(el.type==='range'||el.tagName==='SELECT'||el.type==='checkbox'?'input':'change',read);
+    if(el.tagName==='SELECT')el.addEventListener('change',read);
+  });
+  mEl('m_go').onclick=()=>{MET.running?metStop():metStart()};
+  mEl('m_x').onclick=()=>metStop();
+  mEl('m_pick').onclick=()=>{const f=mEl('metrofile');f.value='';f.click()};
+  mEl('metrofile').onchange=e=>{const f=e.target.files[0];if(f)metLoadSong(f)};
+  mEl('m_tap').onclick=()=>{
+    const n=performance.now();if(metTaps.length&&n-metTaps[metTaps.length-1]>2500)metTaps.length=0;
+    metTaps.push(n);if(metTaps.length>8)metTaps.shift();
+    if(metTaps.length>=3){const d=(metTaps[metTaps.length-1]-metTaps[0])/(metTaps.length-1);P.bpm=Math.round(mClamp(60000/d,20,480));mEl('metro').querySelector('[data-k="bpm"]').value=P.bpm;metChanged('bpm')}
+  };
+  mEl('mcv').addEventListener('pointerdown',e=>{
+    if(!(MET.running&&MET.p.mode==='song'&&MET.song))return;
+    const r=e.currentTarget.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+    if(y>=r.height-30){e.preventDefault();metSeek(mClamp((x-12)/Math.max(1,r.width-24),0,1)*MET.song.buf.duration)}
+  });
+  const panel=mEl('metro');
+  mEl('metroBtn').onclick=()=>{
+    if(panel.style.display==='flex'){panel.style.display='none';return}
+    mEl('presets').style.display='none';mEl('cfg').style.display='none';panel.style.display='flex';metVis();metUI();
+  };
+  mEl('menu').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&b.id!=='metroBtn')panel.style.display='none'});
+  addEventListener('pointerdown',e=>{if(panel.style.display==='flex'&&!panel.contains(e.target)&&e.target.id!=='metroBtn')panel.style.display='none'},true);
+  addEventListener('keydown',e=>{
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
+    if(mEl('dlg').style.display==='flex')return;
+    const t=e.target;if(t&&t.matches&&t.matches('textarea,[contenteditable],select,input:not([type=range]):not([type=checkbox])'))return;
+    const k=e.key.toLowerCase();
+    if(k==='b'){e.preventDefault();MET.running?metStop():metStart()}
+  });
+  addEventListener('resize',()=>{if(MET.running&&MET.p.view!=='off')metSize()});
+  metVis();metUI();
+}
+metLoad();metBind();
 /* ---------- sessão (salvar e restaurar a parede) ---------- */
 const SKEY='ly:session',OKEY='ly:opt:restore',RKEY='ly:restoring';
 let lastSess='';

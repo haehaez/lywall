@@ -1,8 +1,8 @@
 {
-  "version": "1.0.12",
+  "version": "1.0.13",
   "file": "index.html",
-  "releasedAt": "2026-10-29T06:35:23.667Z",
+  "releasedAt": "2026-10-29T06:48:20.386Z",
   "notes": "Metrônomo com modos e música sincronizada",
-  "sha256": "c58888b640d3329945e3985add1515dc4b8152af89112f94460b8d4ad27b53c3",
-  "sig": "Q64yY2hUCZjzKZr4ZsAt7dEuPFtkPsjl8Egbf+/8QbI7xr5gJ4HSrMfsCmyhu8uj7MPelCpfPGyAal3f3FccAQ=="
+  "sha256": "1926c40dc79f679271e0b77b1ca5b40de002caa4e2e801945adeaf08c5aad930",
+  "sig": "DjkanThzy59fE4emQdG+QCtBlAO+L88p3tn1byUjHe/fd13+ANr1HOAeevHtPfo6k/Qtt7xWqjDW36KkOMVpDA=="
 }
