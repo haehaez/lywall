@@ -1540,14 +1540,26 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession
   const d=window.desktop;if(!d||!d.applyUpdate)return;
   const b=document.getElementById('upd');let busy=false,latest=null;
   function show(i){latest=i;b.textContent='\u2B07 Atualiza\u00e7\u00e3o '+i.version+' dispon\u00edvel';b.disabled=false;b.style.display='block'}
+  const recheck=async()=>{try{const f=await d.checkUpdate();return f&&f.available?f:null}catch(e){return null}};
+  const apply=async()=>{try{return await d.applyUpdate()}catch(e){return{ok:false,error:String(e&&e.message||e)}}};
   b.onclick=async()=>{
     if(busy)return;
-    if(!await ask('Baixar e aplicar a atualização?\n\nSua parede é salva e restaurada logo depois (se a restauração estiver ligada nas Configurações).'+(latest&&latest.notes?'\n\nNovidades:\n'+latest.notes:''),'Atualizar'))return;
+    // confere o GitHub de novo antes de perguntar: pode ter saído uma versão mais nova desde o aviso
+    busy=true;b.disabled=true;b.textContent='Conferindo\u2026';
+    const fresh=await recheck();
+    busy=false;b.disabled=false;
+    if(!fresh){if(latest)show(latest);toast('Não consegui confirmar a atualização agora.\nTente de novo em instantes.',4000);return}
+    show(fresh);
+    if(!await ask('Baixar e aplicar a atualização?\n\nSua parede é salva e restaurada logo depois (se a restauração estiver ligada nas Configurações).'+(fresh.notes?'\n\nNovidades:\n'+fresh.notes:''),'Atualizar'))return;
     busy=true;b.disabled=true;b.textContent='Baixando\u2026';
     saveSessionNow();
-    let r;try{r=await d.applyUpdate()}catch(e){r={ok:false}}
+    let r=await apply();
+    if(!(r&&r.ok)){ // segunda tentativa, já com a checagem mais recente
+      b.textContent='Tentando de novo\u2026';
+      const f2=await recheck();if(f2){latest=f2;r=await apply()}
+    }
     if(r&&r.ok){b.textContent='Aplicando\u2026'}
-    else{busy=false;b.disabled=false;b.textContent='Falhou \u2014 tentar de novo'}
+    else{busy=false;b.disabled=false;b.textContent='Falhou \u2014 tentar de novo';toast('Não foi possível atualizar: '+((r&&r.error)||'erro desconhecido')+'\nTente de novo em alguns minutos.',7000)}
   };
   d.onUpdate(show);
   d.checkUpdate().then(i=>{if(i&&i.available)show(i)}).catch(()=>{});
