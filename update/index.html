@@ -157,9 +157,42 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 .met-hint{font-size:12px;color:var(--mute);line-height:1.45}
 .met-hr{border:0;border-top:1px solid rgba(255,255,255,.08);margin:2px 0;width:100%}
 .met-song{display:flex;flex-direction:column;gap:8px}
-#mviz{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:99997;width:min(460px,calc(100vw - 24px));border-radius:14px;background:rgba(14,16,20,.9);border:1px solid rgba(255,255,255,.1);overflow:hidden;display:none;touch-action:manipulation}
+#mviz{position:fixed;left:12px;bottom:calc(66px + env(safe-area-inset-bottom,0px));z-index:99997;width:min(460px,calc(100vw - 24px));border-radius:14px;background:rgba(14,16,20,.9);border:1px solid rgba(255,255,255,.1);overflow:hidden;display:none;touch-action:manipulation}
 #mviz canvas{display:block;width:100%;height:124px;cursor:pointer}
 #mviz button{position:absolute;top:6px;right:6px;width:26px;height:26px;padding:0;border-radius:8px;border:1px solid #2b2e35;background:rgba(14,16,20,.8);color:var(--fg);font-size:11px;cursor:pointer}
+#tmr{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:99996;display:none;align-items:center;gap:8px}
+#tm_btn{width:42px;height:42px;padding:0;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(18,20,25,.92);cursor:pointer;display:flex;align-items:center;justify-content:center}
+#tm_btn:hover{border-color:#cbbdef}
+#tm_btn svg{width:26px;height:26px}
+#tm_t{font:600 15px system-ui,sans-serif;color:var(--fg);font-variant-numeric:tabular-nums;padding:7px 11px;border-radius:10px;background:rgba(18,20,25,.88);border:1px solid rgba(255,255,255,.08);display:none}
+#tmr.run #tm_t{display:block}
+#tmr.over #tm_t{border-color:#ffd166;color:#ffd166}
+#lock,#panic{position:fixed;inset:0;display:none}
+#lock{z-index:100020;background:#08090b;align-items:center;justify-content:center}
+#panic{z-index:100019;background:#000}
+.lk-box{display:flex;flex-direction:column;align-items:center;gap:12px;width:min(300px,calc(100vw - 32px))}
+.lk-box .logo{font-size:84px;margin-bottom:6px}
+.lk-box input{width:100%;text-align:center;letter-spacing:.4em;font-size:20px;padding:10px;border-radius:12px;border:1px solid #2b2e35;background:#14161a;color:var(--fg)}
+.lk-box button{width:100%;padding:10px;border-radius:12px;border:1px solid var(--acc);background:rgba(91,140,255,.22);color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+#lk_msg{min-height:18px;font-size:12px;color:#ff8a8a;text-align:center}
+#fdlg{position:fixed;inset:0;z-index:100012;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55)}
+#fdlg .box{width:min(420px,calc(100vw - 32px));padding:18px;border-radius:14px;background:#14161a;border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 48px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:10px}
+#fdlg .fd-t{font-weight:600;font-size:15px}
+#fdlg p{margin:0;font-size:13px;line-height:1.5;color:#c4c7cc;white-space:pre-line}
+#fdlg .fd-f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#9aa0a6}
+#fdlg input{padding:9px 10px;border-radius:10px;border:1px solid #2b2e35;background:#0e1013;color:var(--fg);font-size:14px}
+#fdlg .fd-n{font-size:12px;line-height:1.5;color:#9aa0a6;padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.04)}
+#fdlg .fd-e{font-size:12px;color:#ff8a8a}
+#fdlg .row{display:flex;justify-content:flex-end;gap:8px;margin-top:2px}
+#fdlg button{padding:8px 14px;border-radius:8px;border:1px solid #2b2e35;background:#1a1d22;color:var(--fg);font-size:13px;cursor:pointer}
+#fdlg button.ok{border-color:var(--acc);background:rgba(91,140,255,.22)}
+.pf-h{font-weight:600;font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.05em;margin-top:6px}
+.pf-inl{display:flex;gap:6px;align-items:center}
+.pf-inl b{font-size:13px;color:var(--fg)}
+.cpane button{padding:6px 10px;border-radius:8px;border:1px solid #2b2e35;background:#1a1d22;color:var(--fg);font-size:12px;cursor:pointer}
+.cpane button:hover{border-color:var(--acc)}
+.crow input[type=number]{width:72px;background:#14161a;color:var(--fg);border:1px solid #2b2e35;border-radius:8px;padding:5px 8px;font-size:13px}
+#presets .pren{padding:7px 9px}
 .rate{position:absolute;top:12px;left:14px;z-index:2;font-size:11px;padding:3px 8px;border-radius:10px;background:rgba(14,16,20,.7);color:#fff;font-variant-numeric:tabular-nums;pointer-events:none}
 .rate{opacity:0;transition:opacity .15s}
 .tile:hover .rate{opacity:1}
@@ -235,6 +268,11 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 <input id="folderfile" type="file" webkitdirectory multiple hidden>
 <div id="ctxmenu" role="menu"></div>
 <div id="toast" role="status" aria-live="polite"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lyg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d6c6f1"/><stop offset=".2" stop-color="#f6c8e3"/><stop offset=".4" stop-color="#c8dcf6"/><stop offset=".6" stop-color="#f4efc8"/><stop offset=".8" stop-color="#f3c7de"/><stop offset="1" stop-color="#cbbdef"/></linearGradient></defs></svg>
+<div id="tmr"><button type="button" id="tm_btn" aria-label="Iniciar timer da sessão" title="Iniciar timer da sessão"><svg viewBox="0 0 24 24" aria-hidden="true"><path id="tm_ic" d="M7 4.5v15l12-7.5z" fill="url(#lyg)"/></svg></button><span id="tm_t">00:00</span></div>
+<div id="lock" role="dialog" aria-label="Bloqueado"><div class="lk-box"><div class="logo" role="img" aria-label="LY(wall)"><b>LY</b><span>(wall)</span></div><input id="lk_pin" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" autocomplete="off" aria-label="PIN"><button type="button" id="lk_go">Entrar</button><div id="lk_msg"></div></div></div>
+<div id="panic" aria-hidden="true"></div>
+<div id="fdlg" role="dialog" aria-modal="true"><div class="box"></div></div>
 <div id="metro" role="dialog" aria-label="Metrônomo" style="display:none">
   <div class="phd">Metrônomo</div>
   <div class="met-row"><button type="button" id="m_go" class="met-go">▶ Iniciar</button><div id="m_stat" class="met-stat">Parado</div></div>
@@ -273,7 +311,20 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
   <div class="phd">Configurações</div>
   <div class="ctabs"><button type="button" data-t="geral" class="on">Geral</button><button type="button" data-t="perfil">Perfil</button><button type="button" data-t="atalhos">Atalhos</button></div>
   <div class="cpane" data-p="geral"><div class="crow"><span>Versão do app</span><b id="cVer">—</b></div><div class="crow"><span>Última atualização</span><b id="cDate">—</b></div><label class="crow"><span>Restaurar a última sessão ao abrir</span><input type="checkbox" id="optRestore" checked></label></div>
-  <div class="cpane" data-p="perfil" style="display:none"><p class="soon">Em breve: perfil e preferências salvas.</p></div>
+  <div class="cpane" data-p="perfil" style="display:none">
+    <div class="pf-h">Privacidade</div>
+    <div class="crow"><span>Tecla de pânico</span><span class="pf-inl"><b id="pf_pkey">F8</b><button type="button" id="pf_pset">Alterar</button><button type="button" id="pf_ptest">Testar</button></span></div>
+    <div class="met-hint">Esconde a tela, pausa e silencia tudo na hora. Aperte a mesma tecla (ou clique) para voltar.</div>
+    <div class="crow"><span>PIN ao abrir</span><span class="pf-inl"><b id="pf_pin">Desligado</b><button type="button" id="pf_pinset">Definir</button><button type="button" id="pf_pinrm" style="display:none">Remover</button></span></div>
+    <label class="crow" id="pf_lockrow" style="display:none"><span>Pedir o PIN depois do pânico</span><input type="checkbox" id="pf_plock"></label>
+    <button type="button" id="pf_lock" style="display:none">Bloquear agora</button>
+    <label class="crow"><span>Não guardar a sessão ao fechar</span><input type="checkbox" id="pf_forget"></label>
+    <div class="met-hint">O PIN é um bloqueio simples contra curiosos e não criptografa seus arquivos. Tudo fica salvo só neste computador.</div>
+    <div class="pf-h">Timer da sessão</div>
+    <div class="crow"><span>Lembrete de pausa (min)</span><input type="number" id="pf_remind" min="0" max="240"></div>
+    <div class="crow"><span>Tempo planejado (min)</span><input type="number" id="pf_planned" min="0" max="600"></div>
+    <div class="met-hint">0 desliga. Os avisos aparecem na tela enquanto o timer estiver ligado.</div>
+  </div>
   <div class="cpane" data-p="atalhos" style="display:none">
     <div class="crow"><span>Desfazer</span><b>Ctrl+Z</b></div>
     <div class="crow"><span>Refazer</span><b>Ctrl+Shift+Z</b></div>
@@ -283,6 +334,7 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
     <div class="crow"><span>Silenciar tudo</span><b>M</b></div>
     <div class="crow"><span>Tela cheia na caixa selecionada</span><b>F</b></div>
     <div class="crow"><span>Iniciar / parar o metrônomo</span><b>B</b></div>
+    <div class="crow"><span>Pânico (esconde tudo)</span><b>F8</b></div>
   </div>
 </div>
 <button id="upd" type="button"></button>
@@ -844,7 +896,14 @@ function renderPresets(msg){
     const ld=document.createElement('button');ld.type='button';ld.textContent='Carregar';ld.onclick=()=>{loadPreset(pr);closePanel()};
     const del=document.createElement('button');del.type='button';del.textContent='×';del.className='pdel';del.setAttribute('aria-label','Excluir preset');
     del.onclick=()=>{writePresets(readPresets().filter(q=>q!==pr&&q.name!==pr.name));renderPresets('Preset excluído.')};
-    row.append(info,ld,del);listEl.appendChild(row);
+    const ren=document.createElement('button');ren.type='button';ren.textContent='✎';ren.className='pren';ren.setAttribute('aria-label','Renomear preset');ren.title='Renomear';
+    ren.onclick=async()=>{
+      const r=await askForm({title:'Renomear preset',fields:[{label:'Novo nome',value:pr.name,maxlength:40}],ok:'Renomear'});if(!r)return;
+      const nn=r.values[0].trim().slice(0,40);if(!nn||nn===pr.name)return;
+      const all=readPresets().slice();if(all.some(a=>a.name===nn)){renderPresets('Já existe um preset com esse nome.');return}
+      const i=all.findIndex(a=>a.name===pr.name);if(i<0)return;all[i]={...all[i],name:nn};writePresets(all);renderPresets('Preset renomeado.');
+    };
+    row.append(info,ld,ren,del);listEl.appendChild(row);
   });
   document.getElementById('pmsg').textContent=msg||'';
 }
@@ -1035,7 +1094,7 @@ function addVideo(f,opt){
   },{once:true});
   setTimeout(show,2000);
 }
-const addFiles=l=>handleFiles(l);
+const addFiles=l=>{if(LOCKED||PANIC)return;handleFiles(l)};
 let depth=0;
 addEventListener('dragenter',e=>{e.preventDefault();depth++;document.body.classList.add('drag')});
 addEventListener('dragover',e=>e.preventDefault());
@@ -1043,6 +1102,7 @@ addEventListener('dragleave',()=>{depth=Math.max(0,depth-1);if(!depth)document.b
 addEventListener('drop',e=>{e.preventDefault();depth=0;document.body.classList.remove('drag');addFiles(e.dataTransfer.files)});
 addEventListener('keydown',e=>{
   if(!(e.ctrlKey||e.metaKey)||e.altKey)return;
+  if(modalOpen())return;
   const k=e.key.toLowerCase(),isRedo=(k==='z'&&e.shiftKey)||k==='y';
   if(!isRedo&&!(k==='z'&&!e.shiftKey))return;
   const t=e.target;
@@ -1051,7 +1111,7 @@ addEventListener('keydown',e=>{
 });
 addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;
-  if(document.getElementById('dlg').style.display==='flex')return;
+  if(modalOpen())return;
   const t=e.target;
   if(t&&t.matches&&t.matches('textarea,[contenteditable],input,select,button'))return;
   const ae=document.activeElement,tileEl=ae&&ae.closest?ae.closest('.tile'):null,k=e.key.toLowerCase();
@@ -1061,6 +1121,7 @@ addEventListener('keydown',e=>{
   else if(k==='f'&&tileEl&&tileEl.requestFullscreen){e.preventDefault();if(document.fullscreenElement)document.exitFullscreen();else tileEl.requestFullscreen().catch(()=>{})}
 });
 addEventListener('paste',e=>{
+  if(LOCKED||PANIC)return;
   const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
   const cd=e.clipboardData;if(!cd)return;
   const ok=f=>/^(video|image)\//.test(f.type)||/\.(mp4|webm|mkv|mov|gif|avif|png|jpe?g|webp)$/i.test(f.name);
@@ -1446,7 +1507,7 @@ function metBind(){
   addEventListener('pointerdown',e=>{if(panel.style.display==='flex'&&!panel.contains(e.target)&&e.target.id!=='metroBtn')panel.style.display='none'},true);
   addEventListener('keydown',e=>{
     if(e.ctrlKey||e.metaKey||e.altKey)return;
-    if(mEl('dlg').style.display==='flex')return;
+    if(modalOpen())return;
     const t=e.target;if(t&&t.matches&&t.matches('textarea,[contenteditable],select,input:not([type=range]):not([type=checkbox])'))return;
     const k=e.key.toLowerCase();
     if(k==='b'){e.preventDefault();MET.running?metStop():metStart()}
@@ -1455,12 +1516,215 @@ function metBind(){
   metVis();metUI();
 }
 metLoad();metBind();
+/* ---------- perfil: privacidade, pânico, PIN e timer da sessão ---------- */
+const PRKEY='ly:profile',PINKEY='ly:pin';
+const PR={panic:{code:'F8',label:'F8',ctrl:false,alt:false,shift:false},panicLock:true,forget:false,remind:0,planned:0,seenSaveNote:false};
+let LOCKED=false,LOCK_STARTUP=false,PANIC=false,PIN_FAILS=0,PIN_BLOCK=0,CAPTURING=false;
+function prLoad(){
+  try{
+    const s=JSON.parse(localStorage.getItem(PRKEY)||'null');if(!s||typeof s!=='object')return;
+    for(const k of ['panicLock','forget','seenSaveNote'])if(typeof s[k]==='boolean')PR[k]=s[k];
+    for(const k of ['remind','planned'])if(Number.isFinite(+s[k]))PR[k]=mClamp(+s[k],0,600);
+    if(s.panic&&typeof s.panic.code==='string')PR.panic={code:s.panic.code,label:String(s.panic.label||s.panic.code).slice(0,24),ctrl:!!s.panic.ctrl,alt:!!s.panic.alt,shift:!!s.panic.shift};
+  }catch(e){}
+}
+function prSave(){try{localStorage.setItem(PRKEY,JSON.stringify(PR))}catch(e){}}
+const modalOpen=()=>['dlg','fdlg','lock','panic'].some(id=>{const e=document.getElementById(id);return !!e&&!!e.style.display&&e.style.display!=='none'});
+/* janela de formulário (PIN, nome do preset...) */
+function askForm(o){
+  return new Promise(res=>{
+    const d=mEl('fdlg'),box=d.firstElementChild;box.innerHTML='';
+    const mk=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e};
+    if(o.title)box.appendChild(mk('div','fd-t',o.title));
+    if(o.msg)box.appendChild(mk('p','',o.msg));
+    const ins=(o.fields||[]).map(f=>{
+      const l=mk('label','fd-f'),i=document.createElement('input');
+      l.appendChild(mk('span','',f.label||''));i.type=f.type||'text';i.value=f.value||'';i.placeholder=f.placeholder||'';
+      if(f.maxlength)i.maxLength=f.maxlength;if(f.inputmode)i.inputMode=f.inputmode;i.autocomplete='off';
+      l.appendChild(i);box.appendChild(l);return i;
+    });
+    const err=mk('div','fd-e');box.appendChild(err);
+    if(o.note)box.appendChild(mk('div','fd-n',o.note));
+    const row=mk('div','row'),no=mk('button','',o.cancel||'Cancelar'),ok=mk('button','ok',o.ok||'OK');no.type=ok.type='button';
+    row.append(no,ok);box.appendChild(row);
+    d.style.display='flex';try{(ins[0]||ok).focus()}catch(e){}
+    const end=v=>{d.style.display='none';box.innerHTML='';d.onkeydown=null;res(v)};
+    const submit=async()=>{const vals=ins.map(i=>i.value);if(o.validate){const m=await o.validate(vals);if(m){err.textContent=m;return}}end({values:vals})};
+    ok.onclick=submit;no.onclick=()=>end(null);
+    d.onkeydown=e=>{if(e.key==='Escape'){e.stopPropagation();end(null)}else if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();submit()}};
+  });
+}
+/* PIN (bloqueio simples; guarda só um hash com sal, nunca o PIN) */
+const pinRec=()=>{try{return JSON.parse(localStorage.getItem(PINKEY)||'null')}catch(e){return null}};
+const pinHas=()=>{const r=pinRec();return !!(r&&r.h&&r.s)};
+const mHex=u=>[...u].map(b=>b.toString(16).padStart(2,'0')).join('');
+async function pinHash(pin,saltHex,method){
+  const salt=saltHex?Uint8Array.from(saltHex.match(/../g).map(h=>parseInt(h,16))):crypto.getRandomValues(new Uint8Array(16));
+  if((!method||method==='pbkdf2')&&window.crypto&&crypto.subtle&&crypto.subtle.importKey){
+    const key=await crypto.subtle.importKey('raw',Uint8Array.from(String(pin),c=>c.charCodeAt(0)&255),'PBKDF2',false,['deriveBits']);
+    const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},key,256);
+    return{s:mHex(salt),h:mHex(new Uint8Array(bits)),m:'pbkdf2'};
+  }
+  let h=2166136261;const str=mHex(salt)+pin;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}
+  return{s:mHex(salt),h:(h>>>0).toString(16),m:'fnv'};
+}
+async function pinSet(pin){localStorage.setItem(PINKEY,JSON.stringify(await pinHash(pin)))}
+async function pinCheck(pin){const r=pinRec();if(!r)return true;const x=await pinHash(String(pin),r.s,r.m);return x.h===r.h}
+/* bloqueio */
+function closeUi(){['metro','cfg','presets','ctxmenu'].forEach(id=>{const e=mEl(id);if(e)e.style.display='none'});mEl('bar').classList.remove('open')}
+function muteAll(){tiles.forEach(x=>{if(!x.isImg&&x.v){x.v.muted=true;if(x.refreshVol)x.refreshVol()}})}
+function lockShow(){const l=mEl('lock');l.style.display='flex';mEl('lk_pin').value='';mEl('lk_msg').textContent='';setTimeout(()=>{try{mEl('lk_pin').focus()}catch(e){}},30)}
+async function lockTry(){
+  const inp=mEl('lk_pin'),msg=mEl('lk_msg');
+  if(Date.now()<PIN_BLOCK){msg.textContent='Muitas tentativas. Espere '+Math.ceil((PIN_BLOCK-Date.now())/1000)+' s.';return}
+  if(await pinCheck(inp.value)){PIN_FAILS=0;unlock()}
+  else{PIN_FAILS++;inp.value='';if(PIN_FAILS>=5){PIN_BLOCK=Date.now()+30000;PIN_FAILS=0;msg.textContent='Muitas tentativas. Espere 30 s.'}else msg.textContent='PIN incorreto.'}
+}
+function unlock(){
+  mEl('lock').style.display='none';mEl('panic').style.display='none';LOCKED=false;PANIC=false;
+  if(LOCK_STARTUP){LOCK_STARTUP=false;restoreSession();lastSess=sessJson()||''}
+  gPaused=false;schedule();
+}
+function lockNow(){if(!pinHas())return;gPaused=true;schedule();muteAll();if(MET.running)metStop();closeUi();LOCKED=true;lockShow()}
+/* pânico: esconde a tela, pausa e silencia tudo */
+function panic(){
+  if(PANIC||LOCKED)return;PANIC=true;
+  closeUi();gPaused=true;schedule();muteAll();if(MET.running)metStop();
+  mEl('panic').style.display='block';
+  if(window.desktop&&window.desktop.minimize){try{window.desktop.minimize()}catch(e){}}
+  if(PR.panicLock&&pinHas()){LOCKED=true;mEl('panic').style.display='none';lockShow()}
+}
+function panicEnd(){if(!PANIC||LOCKED)return;PANIC=false;mEl('panic').style.display='none';gPaused=false;schedule()}
+function okPanicKey(e){
+  if(['Escape','F11','F12','Tab','Enter','Space','Backspace'].includes(e.code)||/^(Control|Alt|Shift|Meta)/.test(e.code))return false;
+  if((e.ctrlKey||e.metaKey)&&['KeyZ','KeyY','KeyV','KeyC','KeyX','KeyA','KeyR','KeyW','KeyQ','KeyP','KeyS'].includes(e.code))return false;
+  return /^F\d+$/.test(e.code)||e.ctrlKey||e.altKey||['Insert','Pause','ScrollLock','Backquote','Home','End','PageUp','PageDown','NumpadMultiply','NumpadDivide','NumpadSubtract','NumpadAdd'].includes(e.code);
+}
+const keyLabel=e=>(e.ctrlKey?'Ctrl+':'')+(e.altKey?'Alt+':'')+(e.shiftKey?'Shift+':'')+(e.key.length===1?e.key.toUpperCase():e.key);
+addEventListener('keydown',e=>{
+  if(CAPTURING||LOCKED)return;
+  const k=PR.panic;
+  if(k&&e.code===k.code&&!!e.ctrlKey===k.ctrl&&!!e.altKey===k.alt&&!!e.shiftKey===k.shift){e.preventDefault();e.stopPropagation();PANIC?panicEnd():panic();return}
+  if(PANIC){e.preventDefault();e.stopPropagation();panicEnd()}
+},true);
+/* nome do preset a partir dos nomes dos arquivos: só a parte "Nome" (ex.: "Sunmi Brasil - 2117644275" -> "Sunmi") */
+const NAME_SKIP=/^(img|vid|video|videos|download|downloads|clip|clips|screen|screenshot|captura|capture|untitled|new|novo|nova|copy|copia|file|arquivo|image|imagem|photo|foto|mov|movie|twitter|tiktok|instagram|insta|reel|reels|shorts|youtube|snaptik|ssstik|fancam|focus|hd|fhd|uhd|full|edit|mp4|gif|webm)$/i;
+function nameOfFile(fn){
+  const b=String(fn||'').replace(/\.[^.\\/]+$/,'').replace(/_+/g,' ').trim();
+  const head=b.split(/\s[-–—|]\s|\s*[|(\[]/)[0].trim();
+  for(const tok of head.split(/[\s.\-]+/).slice(0,3)){
+    if(!tok)continue;
+    if(!/^[\p{L}\p{M}'’]+$/u.test(tok))return '';
+    if(tok.length<2||NAME_SKIP.test(tok))continue;
+    if(tok===tok.toLowerCase())return tok[0].toUpperCase()+tok.slice(1);
+    if(tok===tok.toUpperCase()&&tok.length>3)return tok[0]+tok.slice(1).toLowerCase();
+    return tok;
+  }
+  return '';
+}
+const isMediaTile=t=>!!(t&&!t.getText&&(t.v||t.isImg||t.ph));
+function nameFromTiles(){
+  const ms=tiles.filter(t=>isMediaTile(t)&&(t.name||(t.entry&&t.entry.name))).sort((a,b)=>Math.abs(a.fy-b.fy)>0.04?a.fy-b.fy:a.fx-b.fx);
+  const names=[];
+  for(const t of ms){const n=nameOfFile(t.name||t.entry.name);if(n&&!names.some(x=>x.toLowerCase()===n.toLowerCase()))names.push(n)}
+  let out='';for(const n of names){const nx=out?out+'/'+n:n;if(nx.length>40)break;out=nx}
+  return{name:out,count:names.length};
+}
+const defaultPresetName=()=>'Sessão '+new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(',','');
+function savePresetNamed(name){
+  const items=snapshot();if(!items.length)return null;
+  const all=readPresets().slice();name=String(name||'').trim().slice(0,40)||defaultPresetName();
+  let n=name,k=2;while(all.some(a=>a.name===n)){n=name.slice(0,36)+' ('+k+')';k++}
+  all.push({name:n,saved:Date.now(),tiles:items});
+  const ok=writePresets(all);
+  toast(ok?'Preset “'+n+'” salvo no seu perfil.':'Preset “'+n+'” guardado só nesta sessão (o armazenamento está bloqueado).',3800);
+  if(mEl('presets').style.display==='flex')renderPresets('');
+  return n;
+}
+/* timer da sessão */
+const TM={run:false,t0:0,iv:0,nextRemind:0,over:false};
+const tmFmt=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60,p=n=>String(n).padStart(2,'0');return(h?h+':':'')+p(m)+':'+p(x)};
+function tmVis(){mEl('tmr').style.display=(tiles.some(isMediaTile)||TM.run)?'flex':'none'}
+function tmRender(){
+  const e=mEl('tmr'),b=mEl('tm_btn');
+  e.classList.toggle('run',TM.run);e.classList.toggle('over',TM.run&&TM.over);
+  mEl('tm_ic').setAttribute('d',TM.run?'M6.5 6.5h11v11h-11z':'M7 4.5v15l12-7.5z');
+  b.setAttribute('aria-label',TM.run?'Parar timer da sessão':'Iniciar timer da sessão');b.title=b.getAttribute('aria-label');
+  if(TM.run)mEl('tm_t').textContent=tmFmt((Date.now()-TM.t0)/1000);
+}
+function tmTick(){
+  if(!TM.run)return;
+  const el=(Date.now()-TM.t0)/1000;tmRender();
+  if(PR.remind>0&&el>=TM.nextRemind){TM.nextRemind+=PR.remind*60;toast('Faz '+Math.round(el/60)+' min de sessão. Que tal uma pausa?',6000)}
+  if(PR.planned>0&&!TM.over&&el>=PR.planned*60){TM.over=true;toast('Tempo planejado atingido ('+PR.planned+' min).',6000);tmRender()}
+}
+function tmStart(){TM.run=true;TM.t0=Date.now();TM.over=false;TM.nextRemind=PR.remind*60;clearInterval(TM.iv);TM.iv=setInterval(tmTick,1000);tmRender();tmVis()}
+async function tmStop(){
+  if(!TM.run)return;
+  const secs=Math.round((Date.now()-TM.t0)/1000);TM.run=false;TM.over=false;clearInterval(TM.iv);tmRender();tmVis();
+  if(!tiles.some(isMediaTile))return;
+  const sug=nameFromTiles(),first=!PR.seenSaveNote;
+  const r=await askForm({
+    title:'Sessão encerrada · '+tmFmt(secs),
+    msg:'Salvar a parede atual como preset no seu perfil?',
+    fields:[{label:'Nome do preset',value:sug.name,placeholder:sug.name?'':'Não deu para definir o nome — escolha um',maxlength:40}],
+    note:first?'Isso é privado: fica só neste computador. O LY(wall) não envia nada para a internet e não guarda nada fora da sua máquina — o preset é salvo localmente, junto com os outros, e só você tem acesso.':'',
+    ok:'Salvar preset',cancel:'Agora não'
+  });
+  if(first){PR.seenSaveNote=true;prSave()}
+  if(r)savePresetNamed(r.values[0]);
+}
+/* aba Perfil */
+function prRender(){
+  const has=pinHas();
+  mEl('pf_pkey').textContent=PR.panic.label;
+  mEl('pf_pin').textContent=has?'Ativado':'Desligado';mEl('pf_pinset').textContent=has?'Alterar':'Definir';
+  mEl('pf_pinrm').style.display=has?'':'none';mEl('pf_lockrow').style.display=has?'':'none';mEl('pf_lock').style.display=has?'':'none';
+  mEl('pf_plock').checked=PR.panicLock;mEl('pf_forget').checked=PR.forget;
+  mEl('pf_remind').value=PR.remind;mEl('pf_planned').value=PR.planned;
+}
+function prBind(){
+  mEl('pf_pset').onclick=()=>{
+    CAPTURING=true;mEl('pf_pkey').textContent='Aperte a tecla…';
+    const h=e=>{
+      if(/^(Control|Alt|Shift|Meta)/.test(e.code))return;
+      e.preventDefault();e.stopPropagation();CAPTURING=false;removeEventListener('keydown',h,true);
+      if(e.code==='Escape'){prRender();return}
+      if(!okPanicKey(e)){toast('Use uma tecla F1–F10, Insert, Pause, Scroll Lock, ` ou uma combinação com Ctrl/Alt.',4500);prRender();return}
+      PR.panic={code:e.code,label:keyLabel(e),ctrl:!!e.ctrlKey,alt:!!e.altKey,shift:!!e.shiftKey};prSave();prRender();
+    };
+    addEventListener('keydown',h,true);
+  };
+  mEl('pf_ptest').onclick=()=>{closeUi();panic()};
+  const needPin=async(title)=>askForm({title,fields:[{label:'PIN atual',type:'password',inputmode:'numeric',maxlength:8}],ok:'Continuar',validate:async v=>(await pinCheck(v[0]))?'':'PIN incorreto.'});
+  mEl('pf_pinset').onclick=async()=>{
+    const has=pinHas();if(has&&!(await needPin('Alterar PIN')))return;
+    const r=await askForm({title:has?'Novo PIN':'Definir PIN',msg:'De 4 a 8 números. É um bloqueio simples contra curiosos e não criptografa seus arquivos.',
+      fields:[{label:'PIN',type:'password',inputmode:'numeric',maxlength:8},{label:'Repita o PIN',type:'password',inputmode:'numeric',maxlength:8}],ok:'Salvar PIN',
+      validate:v=>!/^\d{4,8}$/.test(v[0])?'Use de 4 a 8 números.':v[0]!==v[1]?'Os PINs não são iguais.':''});
+    if(!r)return;await pinSet(r.values[0]);toast('PIN definido.',2500);prRender();
+  };
+  mEl('pf_pinrm').onclick=async()=>{if(!(await needPin('Remover PIN')))return;try{localStorage.removeItem(PINKEY)}catch(e){}toast('PIN removido.',2500);prRender()};
+  mEl('pf_lock').onclick=()=>lockNow();
+  mEl('pf_plock').onchange=e=>{PR.panicLock=e.target.checked;prSave()};
+  mEl('pf_forget').onchange=e=>{PR.forget=e.target.checked;prSave();if(PR.forget){try{localStorage.removeItem('ly:session')}catch(_){}}};
+  for(const [id,k,max] of [['pf_remind','remind',240],['pf_planned','planned',600]])mEl(id).onchange=e=>{PR[k]=mClamp(mNum(e.target.value,0),0,max);e.target.value=PR[k];prSave()};
+  mEl('tm_btn').onclick=()=>{TM.run?tmStop():tmStart()};
+  mEl('lk_go').onclick=lockTry;
+  mEl('lk_pin').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lockTry()}});
+  mEl('panic').addEventListener('pointerdown',()=>panicEnd());
+  setInterval(tmVis,700);
+  prRender();
+}
+prLoad();prBind();
 /* ---------- sessão (salvar e restaurar a parede) ---------- */
 const SKEY='ly:session',OKEY='ly:opt:restore',RKEY='ly:restoring';
 let lastSess='';
 function sessJson(){try{return JSON.stringify({tiles:snapshot()})}catch(e){return null}}
 function saveSessionNow(){
   try{
+    if(LOCKED)return;
+    if(PR.forget){localStorage.removeItem(SKEY);return}
     if(tiles.some(t=>!t.placed))return;
     const j=sessJson();if(j===null||j===lastSess)return;
     lastSess=j;
@@ -1470,7 +1734,7 @@ function saveSessionNow(){
 }
 function restoreSession(){
   try{
-    if(localStorage.getItem(OKEY)==='0')return;
+    if(PR.forget||localStorage.getItem(OKEY)==='0')return;
     if(localStorage.getItem(RKEY)==='1'){localStorage.removeItem(SKEY);localStorage.removeItem(RKEY);return}
     const s=JSON.parse(localStorage.getItem(SKEY)||'null');
     if(!s||!Array.isArray(s.tiles)||!s.tiles.length)return;
@@ -1485,8 +1749,8 @@ function restoreSession(){
   try{oc.checked=localStorage.getItem(OKEY)!=='0'}catch(e){}
   oc.onchange=()=>{try{localStorage.setItem(OKEY,oc.checked?'1':'0')}catch(e){}};
 })();
-restoreSession();
-lastSess=sessJson()||'';
+if(pinHas()){LOCKED=true;LOCK_STARTUP=true;lockShow()}
+else{restoreSession();lastSess=sessJson()||''}
 setInterval(saveSessionNow,3000);
 addEventListener('pagehide',saveSessionNow);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSessionNow()});
