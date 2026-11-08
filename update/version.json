@@ -1,8 +1,8 @@
 {
-  "version": "1.0.20",
+  "version": "1.0.21",
   "file": "index.html",
-  "releasedAt": "2026-11-08T22:00:52.500Z",
-  "notes": "+ Novidades com cores; + Barra de progresso no update; - Botão azul antigo",
-  "sha256": "e43967d40fb8aa1fccac180dd006e59413e8458163bc37e333a0296b31b4bb68",
-  "sig": "V9GDFPLpC3HPcCdKyNAlyUsePhkXeQks8Bgffku7V6ZWpp+5gBR4/C5DhkqC+VlTkQvXvrPKRQ8ZeBRWzyqABw=="
+  "releasedAt": "2026-11-08T22:13:27.951Z",
+  "notes": "+ Pausa por vídeo e gif com duplo clique\n+ Volume com degradê da logo",
+  "sha256": "78c7746226793144b27189ecab6cbebb3d1a13741fafac9709499512621d2367",
+  "sig": "S3DsLno6eFMvyiAjeP44UqDi8L46606KtJg7WnWjPmmRkJZmOZPNBeaGegUKWqh02Sjg9DVsKSpRtYRz+XNECA=="
 }
