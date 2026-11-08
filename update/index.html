@@ -235,12 +235,18 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 #presets .pdel{padding:7px 10px}
 #presets .pdel:hover{border-color:#e04040;background:rgba(224,64,64,.25)}
 #pmsg:empty{display:none}
-#pending{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:99997;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;background:rgba(20,22,26,.95);border:1px solid #2b2e35;font-size:13px}
+#pending{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:99997;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 10px;max-width:min(720px,calc(100vw - 380px));padding:8px 10px 8px 14px;border-radius:12px;background:rgba(20,22,26,.96);border:1px solid #2b2e35;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+#pending #pendx{padding:4px 9px;font-size:15px;line-height:1;border-radius:8px;color:#9a9ea8}
 #pending button{padding:6px 10px;border-radius:8px;border:1px solid #2b2e35;background:#14161a;color:var(--fg);font-size:12px;cursor:pointer}
 #pending button:hover{border-color:var(--acc)}
-.ph{background:repeating-linear-gradient(45deg,#101216,#101216 10px,#0c0e11 10px,#0c0e11 20px);border:1px dashed #3a3e47;cursor:pointer}
-.phbody{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:18px;text-align:center;color:#9a9ea8;font-size:13px}
-.phbody b{color:var(--fg);font-size:14px;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text;cursor:text}
+.ph{background:repeating-linear-gradient(45deg,#101216,#101216 10px,#0c0e11 10px,#0c0e11 20px);border:1px dashed #3a3e47;cursor:pointer;container-type:size}
+.phbody{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px 12px;text-align:center;color:#9a9ea8;font-size:13px;overflow:hidden;min-height:0}
+.phbody>*{max-width:100%}
+@container (max-height:190px){.phbody small{display:none}}
+@container (max-height:130px){.phbody .phcopy{display:none}.phbody{gap:2px}}
+@container (max-height:80px){.phbody>span{display:none}}
+@container (max-width:170px){.phbody small,.phbody .phcopy{display:none}}
+.phbody b{color:var(--fg);font-size:14px;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text;cursor:text;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .phcopy{padding:4px 10px;border-radius:8px;border:1px solid #2b2e35;background:#14161a;color:var(--fg);font-size:12px;cursor:pointer}
 .phcopy:hover{border-color:var(--acc)}
 .phbody small{color:#7d8088}
@@ -262,7 +268,7 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
   <div class="pft"><button id="pexp" type="button">Exportar</button><button id="pimp" type="button">Importar</button></div>
   <div id="pmsg"></div>
 </div>
-<div id="pending" style="display:none"><span></span><button id="pendbtn" type="button">Selecionar arquivos</button><button id="pendfolder" type="button">Escolher pasta</button></div>
+<div id="pending" style="display:none"><span></span><button id="pendbtn" type="button">Selecionar arquivos</button><button id="pendfolder" type="button">Escolher pasta</button><button id="pendx" type="button" aria-label="Esconder aviso" title="Esconder">×</button></div>
 <input id="pfile" type="file" accept=".json,application/json" hidden>
 <input id="phfile" type="file" accept="video/*,image/*,.mkv,.mov" hidden>
 <input id="folderfile" type="file" webkitdirectory multiple hidden>
@@ -367,10 +373,12 @@ function setRect(t,l,tp,w,h){
   const W=cw(),H=CH;
   t.fx=l/W;t.fy=tp/H;t.fw=w/W;t.fh=h/H;applyRect(t);
 }
+let pendHideFor=-1;
 function refreshEmpty(){
   empty.style.display=tiles.length?'none':'flex';
   const n=tiles.filter(t=>t.ph).length,pb=document.getElementById('pending');
-  pb.style.display=n?'flex':'none';
+  if(n!==pendHideFor)pendHideFor=-1;
+  pb.style.display=(n&&pendHideFor!==n)?'flex':'none';
   pb.firstElementChild.textContent=n+(n===1?' arquivo aguardando':' arquivos aguardando')+' para completar o preset';
 }
 function sizeFor(item,sc){
@@ -824,7 +832,7 @@ function makePlaceholder(e,rect,z){
   const body=document.createElement('div');body.className='phbody';
   const t1=document.createElement('span');t1.textContent='Arquivo aguardando';
   const nm=document.createElement('b');nm.className='phname';nm.textContent=e.name||'(sem nome)';
-  const t2=document.createElement('small');t2.textContent='Solte o arquivo aqui, clique para escolher ou passe o mouse e aperte Ctrl+V';
+  const t2=document.createElement('small');t2.textContent='Solte o arquivo aqui, clique ou use Ctrl+V';
   const cp=document.createElement('button');cp.type='button';cp.className='phcopy';cp.textContent='Copiar nome';
   cp.addEventListener('click',async ev=>{
     ev.stopPropagation();
@@ -954,6 +962,7 @@ function initPresets(){
   };
   document.getElementById('phfile').onchange=e=>{const f=e.target.files[0];if(f&&phTarget&&tiles.includes(phTarget))linkPlaceholder(phTarget,f)};
   document.getElementById('pendbtn').onclick=()=>file.click();
+  document.getElementById('pendx').onclick=()=>{pendHideFor=tiles.filter(t=>t.ph).length;document.getElementById('pending').style.display='none'};
   document.getElementById('pendfolder').onclick=()=>{const fi=document.getElementById('folderfile');fi.value='';fi.click()};
   document.getElementById('folderfile').onchange=e=>{relinkFromFolder(e.target.files)};
   addEventListener('pointerdown',e=>{if(panel.style.display==='flex'&&!panel.contains(e.target)&&e.target.id!=='presetsBtn')closePanel()},true);

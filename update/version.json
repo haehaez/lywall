@@ -1,8 +1,1 @@
-{
-  "version": "1.0.15",
-  "file": "index.html",
-  "releasedAt": "2026-11-06T15:33:09.610Z",
-  "notes": "Perfil com pânico e PIN, e timer da sessão",
-  "sha256": "0c8bc1319b65de91e68416f9666d0f860dad21a14dc0c19749f7cc5606bb56e7",
-  "sig": "Bv+ZNAVwy5ExaepRRegK4hoWkUQV8XSMr5cbp+J957L2ku5HNnc/g70jYjC8cR+D26CGmAkEHJiINNxgysd9DQ=="
-}
+{"version":"1.0.16","releasedAt":"2026-11-08T15:37:46.639Z","notes":"Acabamento do aviso de arquivos aguardando"}
