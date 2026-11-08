@@ -1,8 +1,8 @@
 {
-  "version": "1.0.22",
+  "version": "1.0.23",
   "file": "index.html",
-  "releasedAt": "2026-11-08T22:28:28.256Z",
-  "notes": "+ Pausa só pelo botão\n+ Timer em aba com menu aberto\n+ BPM arrastável para as laterais\n- Duplo clique que zerava o zoom",
-  "sha256": "ee8af8e5ffbfc8e79b9377ccd6128f786c941cc54df9850a3fd53d8ffdd0d45a",
-  "sig": "hkEMXYDlSNTViMg3HJv/LpEGnQ8/WQdhMc4nbf2mvftiGd6TSLVUimn9TyrV4t+pSxP63Ho5j9BeaZLynJBLBw=="
+  "releasedAt": "2026-11-08T23:11:01.479Z",
+  "notes": "- Duplo clique pausando\n+ Duplo clique volta o zoom\n+ Pausa só pelo botão",
+  "sha256": "cc47f3ef5143b087b7c643e0600b848ec881139850e2bcb6f66d63d8c7d16471",
+  "sig": "bhMXKdKeY4tkrhYOt6lop7+E1oJlwjqOpE7epiyA9EU4XlSVzZAGt4VflVMBlRgMQQuZdFDXR4hCLqVlcIYZAg=="
 }
