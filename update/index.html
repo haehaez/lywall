@@ -191,6 +191,14 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 #fdlg .fd-f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#9aa0a6}
 #fdlg input{padding:9px 10px;border-radius:10px;border:1px solid #2b2e35;background:#0e1013;color:var(--fg);font-size:14px}
 #fdlg .fd-n{white-space:pre-line;font-size:12px;line-height:1.5;color:#9aa0a6;padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.04)}
+#dlg .fd-lines,#fdlg .fd-lines{display:flex;flex-direction:column;gap:5px;font-size:13px;line-height:1.45;padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.04)}
+#dlg .fd-ln.add,#fdlg .fd-ln.add{color:#cbbdef}
+#dlg .fd-ln.rem,#fdlg .fd-ln.rem{color:#ff8a8a}
+#upd{overflow:hidden;min-width:200px;text-align:center}
+#upd .upd-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(203,189,239,.38);transition:width .25s ease;z-index:0}
+#upd .upd-txt{position:relative;z-index:1}
+#upd.bad{border-color:#ff8a8a}
+#upd.bad .upd-fill{background:rgba(255,138,138,.3)}
 #fdlg .fd-e{font-size:12px;color:#ff8a8a}
 #fdlg .row{display:flex;justify-content:flex-end;gap:8px;margin-top:2px}
 #fdlg button{padding:8px 14px;border-radius:8px;border:1px solid #2b2e35;background:#1a1d22;color:var(--fg);font-size:13px;cursor:pointer}
@@ -749,10 +757,10 @@ function writePresets(a){
 /* ---------- avisos (toast) e confirmação ---------- */
 let toastT=0;
 function toast(msg,ms){const t=document.getElementById('toast');t.textContent=String(msg).replace(/\. (?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g,'.\n');t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),ms||2200)}
-function ask(msg,okLabel){
+function ask(msg,okLabel,lines){
   return new Promise(res=>{
     const d=document.getElementById('dlg'),ok=d.querySelector('.ok'),no=d.querySelector('.no');
-    d.querySelector('p').textContent=msg;ok.textContent=okLabel||'OK';d.style.display='flex';ok.focus();
+    d.querySelector('p').textContent=msg;d.querySelectorAll('.fd-lines').forEach(x=>x.remove());if(lines&&lines.length){const L=document.createElement('div');L.className='fd-lines';for(const ln of lines){const r=document.createElement('div');r.className='fd-ln '+(ln.k==='+'?'add':ln.k==='-'?'rem':'');r.textContent=(ln.k==='+'||ln.k==='-'?ln.k+' ':'')+ln.t;L.appendChild(r)}d.querySelector('p').after(L)}ok.textContent=okLabel||'OK';d.style.display='flex';ok.focus();
     const end=v=>{d.style.display='none';ok.onclick=no.onclick=null;d.onkeydown=null;res(v)};
     ok.onclick=()=>end(true);no.onclick=()=>end(false);
     d.onkeydown=e=>{if(e.key==='Escape'){e.stopPropagation();end(false)}};
@@ -1580,6 +1588,7 @@ function askForm(o){
       l.appendChild(i);box.appendChild(l);return i;
     });
     const err=mk('div','fd-e');box.appendChild(err);
+    if(o.lines&&o.lines.length){const L=mk('div','fd-lines');for(const ln of o.lines){const row=mk('div','fd-ln '+(ln.k==='+'?'add':ln.k==='-'?'rem':''));row.textContent=(ln.k==='+'||ln.k==='-'?ln.k+' ':'')+ln.t;L.appendChild(row)}box.appendChild(L)}
     if(o.note)box.appendChild(mk('div','fd-n',String(o.note).replace(/\. (?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g,'.\n')));
     const row=mk('div','row'),no=mk('button','',o.cancel||'Cancelar'),ok=mk('button','ok',o.ok||'OK');no.type=ok.type='button';
     row.append(no,ok);box.appendChild(row);
@@ -1890,28 +1899,34 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession
 /* ---------- atualização (só no app desktop) ---------- */
 (function(){
   const d=window.desktop;if(!d||!d.applyUpdate)return;
-  const b=document.getElementById('upd');let busy=false,latest=null;
-  function show(i){latest=i;b.textContent='\u2B07 Atualiza\u00e7\u00e3o '+i.version+' dispon\u00edvel';b.disabled=false;b.style.display='block'}
+  const b=document.getElementById('upd');let busy=false,latest=null,prog=0,target=0,tick=0,label='';
+  b.innerHTML='<span class="upd-fill"></span><span class="upd-txt"></span>';
+  const txt=b.querySelector('.upd-txt'),fill=b.querySelector('.upd-fill');
+  const setP=(p,t,bad)=>{fill.style.width=Math.max(0,Math.min(100,p))+'%';txt.textContent=t;b.classList.toggle('bad',!!bad)};
+  const parseNotes=t=>String(t||'').split(/\n|;/).map(x=>x.trim()).filter(Boolean).map(x=>x[0]==='+'?{k:'+',t:x.slice(1).trim()}:x[0]==='-'?{k:'-',t:x.slice(1).trim()}:{k:' ',t:x});
+  function show(i){latest=i;setP(0,'⬇ Atualização '+i.version+' disponível');b.disabled=false;b.style.display='block'}
+  // barra animada: avança até o alvo da etapa, sem passar dele
+  function go(to,lbl){target=to;label=lbl;clearInterval(tick);tick=setInterval(()=>{prog+=(target-prog)*0.07;if(target-prog<0.3)prog=target;setP(prog,label+' '+Math.round(prog)+'%')},120)}
+  function end(ok,msg){clearInterval(tick);if(ok){prog=100;setP(100,msg||'Aplicando 100%')}else{setP(prog,msg||'Falhou — tentar de novo',true)}}
   const recheck=async()=>{try{const f=await d.checkUpdate();return f&&f.available?f:null}catch(e){return null}};
   const apply=async()=>{try{return await d.applyUpdate()}catch(e){return{ok:false,error:String(e&&e.message||e)}}};
   b.onclick=async()=>{
     if(busy)return;
-    // confere o GitHub de novo antes de perguntar: pode ter saído uma versão mais nova desde o aviso
-    busy=true;b.disabled=true;b.textContent='Conferindo\u2026';
+    busy=true;b.disabled=true;prog=0;go(12,'Conferindo');
     const fresh=await recheck();
-    busy=false;b.disabled=false;
-    if(!fresh){if(latest)show(latest);toast('Não consegui confirmar a atualização agora.\nTente de novo em instantes.',4000);return}
-    show(fresh);
-    if(!await ask('Baixar e aplicar a atualização?\n\nSua parede é salva e restaurada logo depois (se a restauração estiver ligada nas Configurações).'+(fresh.notes?'\n\nNovidades:\n'+fresh.notes:''),'Atualizar'))return;
-    busy=true;b.disabled=true;b.textContent='Baixando\u2026';
+    if(!fresh){end(false,'Não consegui confirmar agora');busy=false;b.disabled=false;toast('Não consegui confirmar a atualização agora.\nTente de novo em instantes.',4000);return}
+    latest=fresh;clearInterval(tick);prog=0;setP(0,'Aguardando sua confirmação');
+    const ok=await ask('Baixar e aplicar a atualização?\n\nSua parede é salva e restaurada logo depois (se a restauração estiver ligada nas Configurações).\n\nNovidades:',"Atualizar",parseNotes(fresh.notes));
+    if(!ok){busy=false;b.disabled=false;show(latest);return}
     saveSessionNow();
+    go(70,'Baixando');
     let r=await apply();
-    if(!(r&&r.ok)){ // segunda tentativa, já com a checagem mais recente
-      b.textContent='Tentando de novo\u2026';
+    if(!(r&&r.ok)){
+      go(85,'Tentando de novo');
       const f2=await recheck();if(f2){latest=f2;r=await apply()}
     }
-    if(r&&r.ok){b.textContent='Aplicando\u2026'}
-    else{busy=false;b.disabled=false;b.textContent='Falhou \u2014 tentar de novo';toast('Não foi possível atualizar: '+((r&&r.error)||'erro desconhecido')+'\nTente de novo em alguns minutos.',7000)}
+    if(r&&r.ok){go(96,'Verificando');end(true,'Aplicando 100%')}
+    else{end(false,'Falhou — '+((r&&r.error)||'erro desconhecido').slice(0,60));busy=false;b.disabled=false;toast('Não foi possível atualizar: '+((r&&r.error)||'erro desconhecido')+'\nTente de novo em alguns minutos.',7000)}
   };
   d.onUpdate(show);
   // versão publicada que o app não pode aceitar (sem assinatura ou assinatura errada): aviso discreto

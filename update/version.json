@@ -1,8 +1,8 @@
 {
-  "version": "1.0.19",
+  "version": "1.0.20",
   "file": "index.html",
-  "releasedAt": "2026-11-08T21:43:21.330Z",
-  "notes": "Logo com (wall) no hover, timer em canto livre, BPM compacto e textos",
-  "sha256": "ac597bda2b2921bfa4f4a6db7c75be95a6329c1ff2617cb072a0c145a8cb8f73",
-  "sig": "eHymK7fDY76zdqv+xwZOaBxNJSx2oFNp3JU47mam3qgpd9/y9EiUMxWlOqZLCDPUPL34Uk1M/ZECFqkzYIWqAA=="
+  "releasedAt": "2026-11-08T22:00:52.500Z",
+  "notes": "+ Novidades com cores; + Barra de progresso no update; - Botão azul antigo",
+  "sha256": "e43967d40fb8aa1fccac180dd006e59413e8458163bc37e333a0296b31b4bb68",
+  "sig": "V9GDFPLpC3HPcCdKyNAlyUsePhkXeQks8Bgffku7V6ZWpp+5gBR4/C5DhkqC+VlTkQvXvrPKRQ8ZeBRWzyqABw=="
 }
