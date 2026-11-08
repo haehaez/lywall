@@ -1,8 +1,8 @@
 {
-  "version": "1.0.17",
+  "version": "1.0.18",
   "file": "index.html",
-  "releasedAt": "2026-11-08T16:27:03.637Z",
-  "notes": "Atualização assinada",
-  "sha256": "cca120cf9e0f7106350070b5015125706b9a408b1c7e045fd354afb75c83b0cf",
-  "sig": "H7/OAWqw8T2mciDGYeIH1Z3OQY2uqhx1IWqQNcog3SeCtwJ6P3yosFQ089gv+PAjnXat910ZNz9UQ+4t7+KTBw=="
+  "releasedAt": "2026-11-08T17:32:39.790Z",
+  "notes": "Destaque lilás, logo com (wall) no hover e ícone LY",
+  "sha256": "7c6380fdbf1cfedc2152d1b61ee25b49251e75dde6d8c15ce9fff040c00085eb",
+  "sig": "CNWR2PF5VFIWXuQ6QnsmaVcpLXAoVcS8ri+Rr2F27gRElqlpFiqJuzJdIbpfTBTKf/k0zv42C3AadDAy3Jh4BA=="
 }
