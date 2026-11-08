@@ -63,8 +63,10 @@ html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:
 #empty p{margin:0;color:var(--mute);max-width:50ch;line-height:1.5}
 .logo{display:flex;align-items:baseline;justify-content:center;gap:.1em;font-size:clamp(76px,15vw,132px);line-height:1;user-select:none;margin-bottom:4px}
 .logo b{font-weight:800;letter-spacing:-.05em;padding-right:.05em;background:var(--holo-d);-webkit-background-clip:text;background-clip:text;color:transparent}
-.logo span{font-size:.22em;font-weight:500;letter-spacing:.06em;color:var(--mute);max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-left:0;transition:max-width .4s ease,opacity .4s ease,margin-left .4s ease}
-.logo:hover span,.logo:focus-within span{max-width:6em;opacity:1;margin-left:.1em}
+.logo{position:relative}
+.logo span{font-size:.22em;font-weight:500;letter-spacing:.06em;color:var(--mute);position:absolute;left:100%;bottom:.28em;margin-left:.12em;white-space:nowrap;opacity:0;transform:translateX(-6px);transition:opacity .35s ease,transform .35s ease;pointer-events:auto}
+.logo:hover span,.logo:focus-within span{opacity:1;transform:none}
+#empty .logo{pointer-events:auto}
 #empty .fmt{display:flex;flex-direction:column;gap:6px;font-family:ui-monospace,Consolas,"SFMono-Regular",monospace;font-size:13px;letter-spacing:.1em;color:var(--mute)}
 #empty button{pointer-events:auto;margin-top:6px;padding:10px 18px;border-radius:8px;border:1px solid #2b2e35;background:#14161a;color:var(--fg);font-size:15px;cursor:pointer}
 #empty button:hover,#empty button:focus-visible{border-color:var(--acc)}
@@ -94,7 +96,7 @@ body.drag #drop{display:flex}
 .crow span{color:var(--mute)}
 label.crow{align-items:center;cursor:pointer}
 .crow input{accent-color:var(--acc);width:16px;height:16px;cursor:pointer}
-.soon{margin:0;padding:6px 2px;font-size:13px;color:var(--mute)}
+.soon{white-space:pre-line;margin:0;padding:6px 2px;font-size:13px;color:var(--mute)}
 #bar.open{opacity:1!important}
 #bar.show{opacity:.9}
 @media (hover:hover){#bar:not(.show):not(.open){pointer-events:none}}
@@ -155,7 +157,7 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 #metro input[type=checkbox]{width:16px;height:16px;accent-color:var(--acc)}
 #metro button:not(.met-go){padding:6px 10px;border-radius:8px;border:1px solid #2b2e35;background:#1a1d22;color:var(--fg);font-size:12px;cursor:pointer}
 #metro button:not(.met-go):hover{border-color:var(--acc)}
-.met-hint{font-size:12px;color:var(--mute);line-height:1.45}
+.met-hint{white-space:pre-line;font-size:12px;color:var(--mute);line-height:1.45}
 .met-hr{border:0;border-top:1px solid rgba(255,255,255,.08);margin:2px 0;width:100%}
 .met-song{display:flex;flex-direction:column;gap:8px}
 #mviz{position:fixed;left:12px;bottom:calc(66px + env(safe-area-inset-bottom,0px));z-index:99997;width:min(460px,calc(100vw - 24px));border-radius:14px;background:rgba(14,16,20,.9);border:1px solid rgba(255,255,255,.1);overflow:hidden;display:none;touch-action:manipulation}
@@ -167,6 +169,12 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 #tm_btn svg{width:26px;height:26px}
 #tm_t{font:600 15px system-ui,sans-serif;color:var(--fg);font-variant-numeric:tabular-nums;padding:7px 11px;border-radius:10px;background:rgba(18,20,25,.88);border:1px solid rgba(255,255,255,.08);display:none}
 #tmr.run #tm_t{display:block}
+#tmr.dock #tm_t{display:none!important}
+#tmpop{position:fixed;right:12px;bottom:calc(66px + env(safe-area-inset-bottom,0px));z-index:99996;padding:5px 10px;border-radius:10px;background:rgba(18,20,25,.8);border:1px solid rgba(255,255,255,.08);color:#e8eaed;font:600 12px system-ui,sans-serif;font-variant-numeric:tabular-nums;pointer-events:none;opacity:0;transform:translateY(6px) scale(.96);transition:opacity .6s ease,transform .6s ease}
+#tmpop.on{opacity:.5;transform:none}
+#mviz.compact{width:72px}
+#mviz.compact #m_x{top:auto;bottom:6px;right:50%;transform:translateX(50%)}
+#mviz.dim{opacity:.35}
 #tmr.over #tm_t{border-color:#ffd166;color:#ffd166}
 #lock,#panic{position:fixed;inset:0;display:none}
 #lock{z-index:100020;background:#08090b;align-items:center;justify-content:center}
@@ -182,7 +190,7 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 #fdlg p{margin:0;font-size:13px;line-height:1.5;color:#c4c7cc;white-space:pre-line}
 #fdlg .fd-f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#9aa0a6}
 #fdlg input{padding:9px 10px;border-radius:10px;border:1px solid #2b2e35;background:#0e1013;color:var(--fg);font-size:14px}
-#fdlg .fd-n{font-size:12px;line-height:1.5;color:#9aa0a6;padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.04)}
+#fdlg .fd-n{white-space:pre-line;font-size:12px;line-height:1.5;color:#9aa0a6;padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.04)}
 #fdlg .fd-e{font-size:12px;color:#ff8a8a}
 #fdlg .row{display:flex;justify-content:flex-end;gap:8px;margin-top:2px}
 #fdlg button{padding:8px 14px;border-radius:8px;border:1px solid #2b2e35;background:#1a1d22;color:var(--fg);font-size:13px;cursor:pointer}
@@ -276,6 +284,7 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 <div id="ctxmenu" role="menu"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lyg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d6c6f1"/><stop offset=".2" stop-color="#f6c8e3"/><stop offset=".4" stop-color="#c8dcf6"/><stop offset=".6" stop-color="#f4efc8"/><stop offset=".8" stop-color="#f3c7de"/><stop offset="1" stop-color="#cbbdef"/></linearGradient></defs></svg>
+<div id="tmpop" aria-hidden="true"></div>
 <div id="tmr"><button type="button" id="tm_btn" aria-label="Iniciar timer da sessão" title="Iniciar timer da sessão"><svg viewBox="0 0 24 24" aria-hidden="true"><path id="tm_ic" d="M7 4.5v15l12-7.5z" fill="url(#lyg)"/></svg></button><span id="tm_t">00:00</span></div>
 <div id="lock" role="dialog" aria-label="Bloqueado"><div class="lk-box"><div class="logo" role="img" aria-label="LY(wall)"><b>LY</b><span>(wall)</span></div><input id="lk_pin" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" autocomplete="off" aria-label="PIN"><button type="button" id="lk_go">Entrar</button><div id="lk_msg"></div></div></div>
 <div id="panic" aria-hidden="true"></div>
@@ -301,7 +310,7 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
     <label class="met-f"><span>Volume do clique</span><input type="range" min="0" max="1" step="0.05" data-k="clickVol"></label>
     <label class="met-f"><span>Volume da música</span><input type="range" min="0" max="1" step="0.05" data-k="songVol"></label>
     <label class="met-f"><span>Ajuste fino (ms)</span><input type="range" min="-250" max="250" step="5" data-k="offset"></label>
-    <div class="met-hint">A música toca junto com as batidas. Clique na barra de progresso do visualizador para ir a outro ponto.</div>
+    <div class="met-hint">A música toca junto com as batidas.<br>Clique na barra de progresso do visualizador para ir a outro ponto.</div>
   </div>
   <hr class="met-hr">
   <div class="met-g"><label>Duração total (min, 0 = sem fim)<input type="number" data-k="total" min="0" max="600" step="0.5"></label><label>Acento a cada (batidas)<input type="number" data-k="accent" min="0" max="16"></label></div>
@@ -321,16 +330,16 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
   <div class="cpane" data-p="perfil" style="display:none">
     <div class="pf-h">Privacidade</div>
     <div class="crow"><span>Tecla de pânico</span><span class="pf-inl"><b id="pf_pkey">F8</b><button type="button" id="pf_pset">Alterar</button><button type="button" id="pf_ptest">Testar</button></span></div>
-    <div class="met-hint">Esconde a tela, pausa e silencia tudo na hora. Aperte a mesma tecla (ou clique) para voltar.</div>
+    <div class="met-hint">Esconde a tela, pausa e silencia tudo na hora.<br>Aperte a mesma tecla (ou clique) para voltar.</div>
     <div class="crow"><span>PIN ao abrir</span><span class="pf-inl"><b id="pf_pin">Desligado</b><button type="button" id="pf_pinset">Definir</button><button type="button" id="pf_pinrm" style="display:none">Remover</button></span></div>
     <label class="crow" id="pf_lockrow" style="display:none"><span>Pedir o PIN depois do pânico</span><input type="checkbox" id="pf_plock"></label>
     <button type="button" id="pf_lock" style="display:none">Bloquear agora</button>
     <label class="crow"><span>Não guardar a sessão ao fechar</span><input type="checkbox" id="pf_forget"></label>
-    <div class="met-hint">O PIN é um bloqueio simples contra curiosos e não criptografa seus arquivos. Tudo fica salvo só neste computador.</div>
+    <div class="met-hint">O PIN é um bloqueio simples contra curiosos e não criptografa seus arquivos.<br>Tudo fica salvo só neste computador.</div>
     <div class="pf-h">Timer da sessão</div>
     <div class="crow"><span>Lembrete de pausa (min)</span><input type="number" id="pf_remind" min="0" max="240"></div>
     <div class="crow"><span>Tempo planejado (min)</span><input type="number" id="pf_planned" min="0" max="600"></div>
-    <div class="met-hint">0 desliga. Os avisos aparecem na tela enquanto o timer estiver ligado.</div>
+    <div class="met-hint">0 desliga.<br>Os avisos aparecem na tela enquanto o timer estiver ligado.</div>
   </div>
   <div class="cpane" data-p="atalhos" style="display:none">
     <div class="crow"><span>Desfazer</span><b>Ctrl+Z</b></div>
@@ -739,7 +748,7 @@ function writePresets(a){
 }
 /* ---------- avisos (toast) e confirmação ---------- */
 let toastT=0;
-function toast(msg,ms){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),ms||2200)}
+function toast(msg,ms){const t=document.getElementById('toast');t.textContent=String(msg).replace(/\. (?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g,'.\n');t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),ms||2200)}
 function ask(msg,okLabel){
   return new Promise(res=>{
     const d=document.getElementById('dlg'),ok=d.querySelector('.ok'),no=d.querySelector('.no');
@@ -1334,7 +1343,8 @@ function metDraw(){
   const c=MET.cx;if(!c||!MET.running)return;
   const W=MET.cw,H=MET.ch,p=MET.p,now=MET.ac.currentTime-metLat(),song=p.mode==='song'&&MET.sg&&MET.song;
   c.clearRect(0,0,W,H);
-  const area=song?H-26:H,bpm=metCurBpm(now);
+  const bpm0=metCurBpm(now);if(MET.compact){metDrawCompact(now,W,H,bpm0);return}
+  const area=song?H-26:H,bpm=bpm0;
   let lastBeat=null;for(const it of MET.q){if(it.t<=now)lastBeat=it;else break}
   const age=lastBeat?now-lastBeat.t:9;
   c.textBaseline='alphabetic';
@@ -1370,6 +1380,22 @@ function metDraw(){
     c.beginPath();c.arc(x0+(x1-x0)*pos/dur,y+2,5,0,6.2832);c.fillStyle='#e8eaed';c.fill();
     c.font='11px system-ui,sans-serif';c.fillStyle='#9aa0a6';c.textAlign='left';c.fillText(mFmt(pos),x0,H-16);c.textAlign='right';c.fillText(mFmt(dur),x1,H-16);
   }
+}
+function metDrawCompact(now,W,H,bpm){
+  const c=MET.cx,X=W/2,Y=H*0.8,look=2.4,speed=(Y-44)/look;
+  c.textAlign='center';c.textBaseline='alphabetic';
+  c.fillStyle='#e8eaed';c.font='700 15px system-ui,sans-serif';c.fillText(String(Math.round(bpm)),X,20);
+  c.fillStyle='#9aa0a6';c.font='10px system-ui,sans-serif';c.fillText('BPM',X,33);
+  c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=2;c.beginPath();c.moveTo(X,40);c.lineTo(X,H-6);c.stroke();
+  c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=2;c.beginPath();c.arc(X,Y,9,0,6.2832);c.stroke();
+  for(const it of MET.q){
+    const dt=it.t-now;if(dt<-0.25||dt>look)continue;
+    const y=Y-dt*speed;if(y<44)continue;
+    const r=it.accent?7:5,fade=dt<0?Math.max(0,1+dt/0.25):Math.min(1,(look-dt)/0.3);
+    c.globalAlpha=fade;c.fillStyle=it.accent?'#f472b6':'#cbbdef';
+    c.beginPath();c.arc(X,y,r,0,6.2832);c.fill();
+  }
+  c.globalAlpha=1;
 }
 /* análise de batidas de uma música (sem rede, tudo local) */
 async function metAnalyze(buf,progress){return metAnalyzePCM(buf.getChannelData(0),buf.numberOfChannels>1?buf.getChannelData(1):null,buf.sampleRate,progress)}
@@ -1546,7 +1572,7 @@ function askForm(o){
     const d=mEl('fdlg'),box=d.firstElementChild;box.innerHTML='';
     const mk=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e};
     if(o.title)box.appendChild(mk('div','fd-t',o.title));
-    if(o.msg)box.appendChild(mk('p','',o.msg));
+    if(o.msg)box.appendChild(mk('p','',String(o.msg).replace(/\. (?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g,'.\n')));
     const ins=(o.fields||[]).map(f=>{
       const l=mk('label','fd-f'),i=document.createElement('input');
       l.appendChild(mk('span','',f.label||''));i.type=f.type||'text';i.value=f.value||'';i.placeholder=f.placeholder||'';
@@ -1554,7 +1580,7 @@ function askForm(o){
       l.appendChild(i);box.appendChild(l);return i;
     });
     const err=mk('div','fd-e');box.appendChild(err);
-    if(o.note)box.appendChild(mk('div','fd-n',o.note));
+    if(o.note)box.appendChild(mk('div','fd-n',String(o.note).replace(/\. (?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g,'.\n')));
     const row=mk('div','row'),no=mk('button','',o.cancel||'Cancelar'),ok=mk('button','ok',o.ok||'OK');no.type=ok.type='button';
     row.append(no,ok);box.appendChild(row);
     d.style.display='flex';try{(ins[0]||ok).focus()}catch(e){}
@@ -1654,9 +1680,59 @@ function savePresetNamed(name){
 /* timer da sessão */
 const TM={run:false,t0:0,iv:0,nextRemind:0,over:false};
 const tmFmt=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60,p=n=>String(n).padStart(2,'0');return(h?h+':':'')+p(m)+':'+p(x)};
-function tmVis(){mEl('tmr').style.display=(tiles.some(isMediaTile)||TM.run)?'flex':'none'}
+/* ---------- posição do timer e do BPM: fora do conteúdo sempre que possível ---------- */
+const LAY={tmMode:'corner',popT:0};const LSTAB={};
+function stable(k,v){const q=LSTAB[k]||(LSTAB[k]={v:null,n:0,cur:null});if(q.v===v)q.n++;else{q.v=v;q.n=1}if(q.n>=3)q.cur=v;return q.cur===null?v:q.cur}
+const layRect=(l,t,w,h)=>({left:l,top:t,right:l+w,bottom:t+h,width:w,height:h});
+const layHit=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
+function tileRects(){const r=[];tiles.forEach(t=>{if(t.hidden)return;const b=t.el.getBoundingClientRect();if(b.width>0)r.push(b)});return r}
+function solidRects(){const r=tileRects(),bar=mEl('bar');if(bar){const b=bar.getBoundingClientRect();if(b.width>0)r.push(b)}return r}
+function shown(id){const e=mEl(id);return !!e&&e.style.display!=='none'}
+function tmPop(){
+  clearTimeout(LAY.popT);const p=mEl('tmpop');if(!p)return;
+  if(!TM.run||LAY.tmMode!=='dock'){p.classList.remove('on');return}
+  p.textContent='🔥 '+tmFmt((Date.now()-TM.t0)/1000);p.classList.add('on');
+  LAY.popT=setTimeout(()=>{p.classList.remove('on');LAY.popT=setTimeout(tmPop,85000)},5000);
+}
+function layoutFloats(){
+  const W=window.innerWidth,H=window.innerHeight,M=12,tmr=mEl('tmr'),mv=mEl('mviz'),mcv=mEl('mcv');
+  if(tmr&&tmr.style.display!=='none'){
+    const tw=TM.run?150:46,th=46;
+    const cs=[layRect(M,H-th-M,tw,th),layRect(M,M,tw,th),layRect(W-tw-M,M,tw,th)];
+    const obs=solidRects().concat(shown('mviz')?[mv.getBoundingClientRect()]:[]);
+    const i=cs.findIndex(R=>!obs.some(o=>layHit(R,o)));
+    const choice=stable('tm',i>=0?'c'+i:'dock');
+    const mode=choice==='dock'?'dock':'corner';
+    if(mode!==LAY.tmMode){LAY.tmMode=mode;tmr.classList.toggle('dock',mode==='dock');tmPop()}
+    if(mode==='corner'){const R=cs[Number(choice.slice(1))]||cs[0];Object.assign(tmr.style,{left:R.left+'px',top:R.top+'px',right:'auto',bottom:'auto'})}
+    else Object.assign(tmr.style,{left:'auto',top:'auto',right:(M+42+8)+'px',bottom:M+'px'});
+  }
+  if(mv&&shown('mviz')){
+    const obs=solidRects().concat(shown('tmr')?[tmr.getBoundingClientRect()]:[]);
+    const mvW=Math.min(460,W-24),mvH=124,hC=Math.min(320,H-160);
+    const wide=[layRect(M,H-mvH-M,mvW,mvH),layRect(M,M,mvW,mvH),layRect(W-mvW-M,M,mvW,mvH)];
+    const vert=[layRect(M,80,72,hC),layRect(W-72-M,80,72,hC)];
+    const free=R=>!obs.some(o=>layHit(R,o));
+    let k=wide.findIndex(free);
+    if(k>=0)k='w'+k;else{const j=vert.findIndex(free);k=j>=0?'v'+j:'dim'}
+    const key=stable('mv',k);
+    const map={w0:[wide[0],false,false],w1:[wide[1],false,false],w2:[wide[2],false,false],v0:[vert[0],true,false],v1:[vert[1],true,false],dim:[wide[0],false,true]};
+    const [R,cp,dim]=map[key]||map.dim;
+    const changed=MET.layKey!==key;MET.layKey=key;
+    MET.compact=cp;mv.classList.toggle('compact',cp);mv.classList.toggle('dim',dim);
+    const over=tileRects().some(t=>layHit(R,t));mv.classList.toggle('dim',dim||over);
+    Object.assign(mv.style,{left:R.left+'px',top:R.top+'px',right:'auto',bottom:'auto',width:R.width+'px',height:R.height+'px'});
+    if(mcv)mcv.style.height=R.height+'px';
+    if(changed&&MET.running)metSize();
+  }
+}
+function tmVis(){
+  mEl('tmr').style.display=(tiles.some(isMediaTile)||TM.run)?'flex':'none';
+  layoutFloats();
+}
 function tmRender(){
   const e=mEl('tmr'),b=mEl('tm_btn');
+  { const pp=mEl('tmpop'); if(pp&&pp.classList.contains('on')&&TM.run)pp.textContent='🔥 '+tmFmt((Date.now()-TM.t0)/1000); }
   e.classList.toggle('run',TM.run);e.classList.toggle('over',TM.run&&TM.over);
   mEl('tm_ic').setAttribute('d',TM.run?'M6.5 6.5h11v11h-11z':'M7 4.5v15l12-7.5z');
   b.setAttribute('aria-label',TM.run?'Parar timer da sessão':'Iniciar timer da sessão');b.title=b.getAttribute('aria-label');
@@ -1668,19 +1744,21 @@ function tmTick(){
   if(PR.remind>0&&el>=TM.nextRemind){TM.nextRemind+=PR.remind*60;toast('Faz '+Math.round(el/60)+' min de sessão. Que tal uma pausa?',6000)}
   if(PR.planned>0&&!TM.over&&el>=PR.planned*60){TM.over=true;toast('Tempo planejado atingido ('+PR.planned+' min).',6000);tmRender()}
 }
-function tmStart(){TM.run=true;TM.t0=Date.now();TM.over=false;TM.nextRemind=PR.remind*60;clearInterval(TM.iv);TM.iv=setInterval(tmTick,1000);tmRender();tmVis()}
+function tmStart(){TM.run=true;TM.t0=Date.now();TM.over=false;TM.nextRemind=PR.remind*60;clearInterval(TM.iv);TM.iv=setInterval(tmTick,1000);tmRender();tmVis();tmPop()}
 async function tmStop(){
   if(!TM.run)return;
-  const secs=Math.round((Date.now()-TM.t0)/1000);TM.run=false;TM.over=false;clearInterval(TM.iv);tmRender();tmVis();
+  const secs=Math.round((Date.now()-TM.t0)/1000);TM.run=false;TM.over=false;clearInterval(TM.iv);tmRender();tmVis();tmPop();
   if(!tiles.some(isMediaTile))return;
-  const sug=nameFromTiles(),first=!PR.seenSaveNote;
+  const sug=nameFromTiles(),first=!PR.seenSaveNote,wasP=gPaused;
+  gPaused=true;schedule();
   const r=await askForm({
-    title:'Sessão encerrada · '+tmFmt(secs),
+    title:'🔥\u2002Sessão encerrada · '+tmFmt(secs),
     msg:'Salvar a parede atual como preset no seu perfil?',
     fields:[{label:'Nome do preset',value:sug.name,placeholder:sug.name?'':'Não deu para definir o nome — escolha um',maxlength:40}],
     note:first?'Isso é privado: fica só neste computador. O LY(wall) não envia nada para a internet e não guarda nada fora da sua máquina — o preset é salvo localmente, junto com os outros, e só você tem acesso.':'',
     ok:'Salvar preset',cancel:'Agora não'
   });
+  gPaused=wasP;schedule();
   if(first){PR.seenSaveNote=true;prSave()}
   if(r)savePresetNamed(r.values[0]);
 }

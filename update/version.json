@@ -1,8 +1,8 @@
 {
-  "version": "1.0.18",
+  "version": "1.0.19",
   "file": "index.html",
-  "releasedAt": "2026-11-08T17:32:39.790Z",
-  "notes": "Destaque lilás, logo com (wall) no hover e ícone LY",
-  "sha256": "7c6380fdbf1cfedc2152d1b61ee25b49251e75dde6d8c15ce9fff040c00085eb",
-  "sig": "CNWR2PF5VFIWXuQ6QnsmaVcpLXAoVcS8ri+Rr2F27gRElqlpFiqJuzJdIbpfTBTKf/k0zv42C3AadDAy3Jh4BA=="
+  "releasedAt": "2026-11-08T21:43:21.330Z",
+  "notes": "Logo com (wall) no hover, timer em canto livre, BPM compacto e textos",
+  "sha256": "ac597bda2b2921bfa4f4a6db7c75be95a6329c1ff2617cb072a0c145a8cb8f73",
+  "sig": "eHymK7fDY76zdqv+xwZOaBxNJSx2oFNp3JU47mam3qgpd9/y9EiUMxWlOqZLCDPUPL34Uk1M/ZECFqkzYIWqAA=="
 }
