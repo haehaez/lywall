@@ -1,7 +1,7 @@
 {
   "features": {
     "metronomo": {
-      "on": true,
+      "on": false,
       "msg": "Metrônomo em manutenção"
     },
     "presets": {
@@ -19,6 +19,6 @@
   },
   "notices": [],
   "maintenance": null,
-  "updatedAt": "2026-11-09T12:46:52.890Z",
-  "sig": "Q3eHN8zxeIZCXZJWIOt12oxKI6/2rgtanpWLRBC8xa/nIg73U6++x9Y4yFShLDZgCzBm4gCzui3ozQioQZW0BQ=="
+  "updatedAt": "2026-11-09T12:55:42.909Z",
+  "sig": "0qsEnczlGXy1st0vGxi6S2kiRZ+sSUsuVBURubed/kwEYLZmR5lBcMXt7+kPmhMDdP5xWoZ74jmZ7qTXRRFmBA=="
 }
