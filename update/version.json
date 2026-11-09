@@ -1,8 +1,8 @@
 {
-  "version": "1.0.24",
+  "version": "1.0.25",
   "file": "index.html",
-  "releasedAt": "2026-11-09T10:54:30.393Z",
-  "notes": "+ Reinicia sozinho ao aplicar o programa\n- Barra não fica mais travada em 100%",
-  "sha256": "3529c8f0d19e02bae083f7539ec8cf583a2e66002dec9c141faf62ca03b4fd7f",
-  "sig": "AqISfOrY7o9tjcwOJoprpkJjH3I3YIReSoQSrUdWIK+Ac4X4nhEed5xzau39TbBnUyRf19lMnkkkUcl0SiZYBA=="
+  "releasedAt": "2026-11-09T11:11:12.444Z",
+  "notes": "+ Metrônomo vertical com bolinhas menores e proporção correta\n- Indicador de qualidade ao lado do botão de pausar",
+  "sha256": "dc56437d66e19a6c5222b0a385ea2baa09a29941ab4cb49e771efd1b46e6dc90",
+  "sig": "Hf45L5KQMaOi1n5Pj5aTOAT57KKsxBy2KsXN7Hs+PRlnd1okmiNvuceCUASvoSJXAsnXxiADKhqmGXOImKFmBw=="
 }

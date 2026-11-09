@@ -133,7 +133,7 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 #ctxmenu .mcol+.mcol{border-left:1px solid rgba(255,255,255,.1);padding-left:6px}
 #ctxmenu button:disabled{opacity:.4;cursor:default;background:none}
 #ctxmenu .mnote{font-size:11px;line-height:1.4;color:#7d8088;padding:6px 10px;max-width:200px}
-.qchip{position:absolute;top:34px;left:14px;z-index:2;font-size:11px;padding:3px 8px;border-radius:10px;background:rgba(14,16,20,.7);color:#fff;font-variant-numeric:tabular-nums;pointer-events:none;opacity:0;transition:opacity .15s}
+.qchip{position:absolute;top:34px;left:46px;z-index:2;font-size:11px;padding:3px 8px;border-radius:10px;background:rgba(14,16,20,.7);color:#fff;font-variant-numeric:tabular-nums;pointer-events:none;opacity:0;transition:opacity .15s}
 .tile:not(.hasrate) .qchip{top:12px}
 .tile:hover .qchip,.qchip.busy{opacity:1}
 #toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(8px);z-index:100002;max-width:min(520px,calc(100vw - 32px));padding:9px 14px;border-radius:10px;background:rgba(24,26,31,.97);border:1px solid rgba(255,255,255,.12);color:var(--fg);font-size:13px;line-height:1.4;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;white-space:pre-line}
@@ -1346,6 +1346,7 @@ function metRestartProg(){
 function metSize(){
   const cv=mEl('mcv'),r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
   const w=Math.max(200,Math.round(r.width||440)),h=Math.round(r.height||124);
+  if(MET.cx&&MET.cw===w&&MET.ch===h&&cv.width===Math.round(w*dpr)&&cv.height===Math.round(h*dpr))return;
   cv.width=w*dpr;cv.height=h*dpr;MET.cw=w;MET.ch=h;
   MET.cx=cv.getContext?cv.getContext('2d'):null;if(MET.cx)MET.cx.setTransform(dpr,0,0,dpr,0,0);
 }
@@ -1410,11 +1411,11 @@ function metDrawCompact(now,W,H,bpm){
   c.fillStyle='#e8eaed';c.font='700 15px system-ui,sans-serif';c.fillText(String(Math.round(bpm)),X,20);
   c.fillStyle='#9aa0a6';c.font='10px system-ui,sans-serif';c.fillText('BPM',X,33);
   c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=2;c.beginPath();c.moveTo(X,40);c.lineTo(X,H-6);c.stroke();
-  c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=2;c.beginPath();c.arc(X,Y,9,0,6.2832);c.stroke();
+  c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=1.5;c.beginPath();c.arc(X,Y,5,0,6.2832);c.stroke();
   for(const it of MET.q){
     const dt=it.t-now;if(dt<-0.25||dt>look)continue;
     const y=Y-dt*speed;if(y<44)continue;
-    const r=it.accent?7:5,fade=dt<0?Math.max(0,1+dt/0.25):Math.min(1,(look-dt)/0.3);
+    const r=it.accent?3.5:2.5,fade=dt<0?Math.max(0,1+dt/0.25):Math.min(1,(look-dt)/0.3);
     c.globalAlpha=fade;c.fillStyle=it.accent?'#f472b6':'#cbbdef';
     c.beginPath();c.arc(X,y,r,0,6.2832);c.fill();
   }
@@ -1774,7 +1775,7 @@ function layoutFloats(){
     tmr.classList.toggle('hid',mode==='dock'&&!mEl('bar').classList.contains('open'));
   }
   if(mv&&shown('mviz')&&MET.dragging)return;
-  if(mv&&shown('mviz')&&MET.dragSide){const hC=Math.min(320,H-160),R=layRect(MET.dragSide==='L'?M:W-72-M,mClamp(MET.dragTop||80,M,H-hC-M),72,hC);MET.compact=true;mv.classList.add('compact');mv.classList.remove('dim');Object.assign(mv.style,{left:R.left+'px',top:R.top+'px',right:'auto',bottom:'auto',width:R.width+'px',height:R.height+'px'});if(mcv)mcv.style.height=R.height+'px';if(MET.running)metSize();return}
+  if(mv&&shown('mviz')&&MET.dragSide){const hC=Math.min(320,H-160),R=layRect(MET.dragSide==='L'?M:W-72-M,mClamp(MET.dragTop||80,M,H-hC-M),72,hC);MET.compact=true;mv.classList.add('compact');mv.classList.remove('dim');Object.assign(mv.style,{left:R.left+'px',top:R.top+'px',right:'auto',bottom:'auto',width:R.width+'px',height:R.height+'px'});if(mcv)mcv.style.height=R.height+'px';metSize();return}
   if(mv&&shown('mviz')){
     const obs=solidRects().concat(shown('tmr')?[tmr.getBoundingClientRect()]:[]);
     const mvW=Math.min(460,W-24),mvH=124,hC=Math.min(320,H-160);
@@ -1791,7 +1792,7 @@ function layoutFloats(){
     const over=tileRects().some(t=>layHit(R,t));mv.classList.toggle('dim',dim||over);
     Object.assign(mv.style,{left:R.left+'px',top:R.top+'px',right:'auto',bottom:'auto',width:R.width+'px',height:R.height+'px'});
     if(mcv)mcv.style.height=R.height+'px';
-    if(changed&&MET.running)metSize();
+    metSize();
   }
 }
 function tmVis(){
