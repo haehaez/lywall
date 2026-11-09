@@ -117,6 +117,7 @@ async function checkCore() {
     if (cmp(m.version, installedCoreVersion()) <= 0) return null;
     const bl = (() => { try { const a = JSON.parse(fs.readFileSync(path.join(UD_(), 'blocked-core.json'), 'utf8')); return Array.isArray(a) ? a : []; } catch { return []; } })();
     if (bl.includes(m.version)) return null;
+    if (cfgList('core').includes(String(m.version))) { log('programa ' + m.version + ' bloqueado pela configuração'); return null; }
     pendingCore = m;
     return m.version;
   } catch { return null; }
@@ -143,6 +144,10 @@ async function applyCoreUpdate() {
   pendingCore = null;
 }
 async function checkUpdate() {
+  if (cfgCache && cfgCache.updates && cfgCache.updates.enabled === false) {
+    pending = null; pendingCore = null;
+    return { available: false, current: readVer(activeDir()) || '0', paused: true, msg: String(cfgCache.updates.msg || '') };
+  }
   let p; try { p = await checkPage(); } catch (e) { log('checagem da página falhou: ' + (e && e.message)); throw e; }
   const cv = await checkCore();
   if (cv && !p.available) return { available: true, version: 'programa ' + cv, current: p.current, notes: 'Atualização do programa. Será aplicada ao reabrir o app.', core: cv };
@@ -165,6 +170,7 @@ async function checkPage() {
   const bl = blockedVersion(), floor = readVer(bundledDir) || '0';
   if (info.version && cmp(info.version, floor) < 0) { pending = null; log('atualização recusada: versão ' + info.version + ' é mais antiga que a do .exe'); return { available: false, current: cur }; }
   if (info.version && cmp(info.version, floor) === 0) { pending = null; return { available: false, current: cur }; } // mesma versão do .exe: está em dia, sem aviso
+  if (info.version && cfgList('page').includes(String(info.version))) { pending = null; log('página ' + info.version + ' bloqueada pela configuração'); return { available: false, current: cur }; }
   if (info.version && cmp(info.version, cur) > 0 && !(bl && cmp(info.version, bl) <= 0)) {
     pending = info;
     return { available: true, version: info.version, current: cur, notes: String(info.notes || '').slice(0, 600) };
@@ -398,6 +404,8 @@ async function refreshConfig() {
     if (mudou && win && !win.isDestroyed()) win.webContents.send('cfg:changed', cfgCache);
   } catch (e) { log('configuração: ' + (e && e.message)); }
 }
+const cfgList = (k) => { const b = cfgCache && cfgCache.blocked; return b && Array.isArray(b[k]) ? b[k].map(String) : []; };
 ipcMain.handle('cfg:get', () => cfgCache);
+ipcMain.handle('cfg:refresh', () => refreshConfig().then(() => cfgCache));
 refreshConfig();
 setInterval(refreshConfig, 30 * 60 * 1000);
