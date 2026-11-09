@@ -278,7 +278,7 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 .phcopy:hover{border-color:var(--acc)}
 .phbody small{color:#7d8088}
 /* ---- configuração remota: features desligadas, avisos e manutenção ---- */
-.feat-off{opacity:.4!important;filter:grayscale(1);pointer-events:none!important}
+.feat-off{opacity:.4!important;filter:grayscale(1);cursor:not-allowed!important}
 #mviz.feat-off{display:none!important}
 #cfgLayer{position:fixed;top:14px;left:0;right:0;margin:0 auto;width:min(420px,calc(100vw - 24px));display:flex;flex-direction:column;gap:8px;pointer-events:none;z-index:100000}
 .cfgN{pointer-events:auto;position:relative;background:rgba(14,16,20,.95);border:1px solid rgba(203,189,239,.35);border-radius:12px;padding:12px 34px 12px 14px;color:#e8eaed;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.4)}
@@ -2032,9 +2032,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession
       for(const id of FEAT[k]){
         const el=document.getElementById(id);if(!el)continue;
         el.classList.toggle('feat-off',off);
-        if(off){if(!('lockT' in el.dataset))el.dataset.lockT=el.title||'';el.title=f.msg||'Indisponível no momento'}
-        else if('lockT' in el.dataset){el.title=el.dataset.lockT;delete el.dataset.lockT}
-        if(el.tagName==='BUTTON')el.disabled=off;
+        if(off){if(!('lockT' in el.dataset))el.dataset.lockT=el.title||'';el.title=f.msg||'Indisponível no momento';el.dataset.off=el.title}
+        else{delete el.dataset.off;if('lockT' in el.dataset){el.title=el.dataset.lockT;delete el.dataset.lockT}}
       }
     }
   }
@@ -2072,6 +2071,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession
     if(!d||!d.getConfig)return;
     try{applyAll(await d.getConfig())}catch(e){}
     if(d.onConfig)d.onConfig(c=>applyAll(c));
+    // clique em feature desligada: não executa e mostra o aviso
+    document.addEventListener('click',e=>{const el=e.target.closest&&e.target.closest('[data-off]');if(!el)return;e.preventDefault();e.stopPropagation();toast(el.dataset.off,3000)},true);
     setInterval(()=>maint(cfg),30000);
   }
   boot();
