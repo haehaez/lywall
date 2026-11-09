@@ -265,7 +265,17 @@ function saveState() {
 
 // ---------- IPC ----------
 ipcMain.handle('update:check', () => checkUpdate().catch((e) => { log('verificação de atualização falhou: ' + (e && e.message || e)); return { available: false }; }));
-ipcMain.handle('update:apply', () => applyUpdate());
+// reinicia sozinho para aplicar o programa novo (o carregador reabre com a versão baixada)
+function scheduleRestart() {
+  log('reiniciando para aplicar o programa novo');
+  setTimeout(() => { try { app.relaunch(); app.exit(0); } catch (e) { log('reinício automático falhou: ' + (e && e.message)); } }, 1500);
+}
+ipcMain.handle('update:apply', async () => {
+  const hadCore = !!pendingCore;
+  const r = await applyUpdate();
+  if (r && r.ok && (hadCore || r.core)) { scheduleRestart(); return { ...r, restart: true }; }
+  return r;
+});
 ipcMain.handle('win:minimize', () => { if (win && !win.isDestroyed()) win.minimize(); });
 ipcMain.handle('update:version', () => readVer(activeDir()) || '0');
 ipcMain.handle('update:info', () => {
