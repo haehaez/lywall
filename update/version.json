@@ -1,8 +1,8 @@
 {
-  "version": "1.0.25",
+  "version": "1.0.26",
   "file": "index.html",
-  "releasedAt": "2026-11-09T11:11:12.444Z",
-  "notes": "+ Metrônomo vertical com bolinhas menores e proporção correta\n- Indicador de qualidade ao lado do botão de pausar",
-  "sha256": "dc56437d66e19a6c5222b0a385ea2baa09a29941ab4cb49e771efd1b46e6dc90",
-  "sig": "Hf45L5KQMaOi1n5Pj5aTOAT57KKsxBy2KsXN7Hs+PRlnd1okmiNvuceCUASvoSJXAsnXxiADKhqmGXOImKFmBw=="
+  "releasedAt": "2026-11-09T12:31:11.697Z",
+  "notes": "+ Painel de avisos e manutenção\n+ Features podem ser desligadas remotamente",
+  "sha256": "1191b908e89f3ed1d286b13606db94ebe5ae273b3be8493de9474724ebb340ad",
+  "sig": "+7Q1bFzjW44C1+/6X0GITASX0e4jFuEtta7w2mvcolqO08Xj3Tm5+3uEMYK/MgSNzsaDO3M+e3HoPYW0VdRDDQ=="
 }

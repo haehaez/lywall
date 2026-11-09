@@ -366,3 +366,37 @@ app.whenReady().then(() => {
   createWindow();
 });
 app.on('window-all-closed', () => app.quit());
+
+
+// ===== configuração remota (features, avisos e manutenção) — assinada com a mesma chave =====
+const CFG_FILE = () => path.join(UD_(), 'config-cache.json');
+const cfgPub = (() => { try { return crypto.createPublicKey(fs.readFileSync(path.join(app.getAppPath(), 'update-public.pem'))); } catch { return null; } })();
+function canonJSON(v) {
+  if (Array.isArray(v)) return '[' + v.map(canonJSON).join(',') + ']';
+  if (v && typeof v === 'object') return '{' + Object.keys(v).sort().filter((k) => v[k] !== undefined).map((k) => JSON.stringify(k) + ':' + canonJSON(v[k])).join(',') + '}';
+  return JSON.stringify(v);
+}
+function cfgSigOk(c) {
+  if (!cfgPub || !c || typeof c.sig !== 'string') return false;
+  const rest = Object.assign({}, c); delete rest.sig;
+  try { return crypto.verify(null, Buffer.from(canonJSON(rest)), cfgPub, Buffer.from(c.sig, 'base64')); } catch { return false; }
+}
+let cfgCache = null;
+try { const c0 = JSON.parse(fs.readFileSync(CFG_FILE(), 'utf8')); if (cfgSigOk(c0)) cfgCache = c0; } catch {}
+async function refreshConfig() {
+  if (!updatesOn()) return;
+  try {
+    const r = await fetch(base() + 'config.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    const c1 = JSON.parse(await r.text());
+    if (!cfgSigOk(c1)) { log('configuração recusada: assinatura inválida'); return; }
+    if (cfgCache && String(c1.updatedAt || '') < String(cfgCache.updatedAt || '')) return; // nunca volta para uma versão mais antiga
+    const mudou = JSON.stringify(c1) !== JSON.stringify(cfgCache);
+    cfgCache = c1;
+    fs.writeFileSync(CFG_FILE(), JSON.stringify(c1));
+    if (mudou && win && !win.isDestroyed()) win.webContents.send('cfg:changed', cfgCache);
+  } catch (e) { log('configuração: ' + (e && e.message)); }
+}
+ipcMain.handle('cfg:get', () => cfgCache);
+refreshConfig();
+setInterval(refreshConfig, 30 * 60 * 1000);

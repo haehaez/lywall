@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('desktop', {
   appVersion: () => ipcRenderer.invoke('update:version'),
   appInfo: () => ipcRenderer.invoke('update:info'),
   minimize: () => ipcRenderer.invoke('win:minimize'),
+  getConfig: () => ipcRenderer.invoke('cfg:get'),
+  onConfig: (cb) => ipcRenderer.on('cfg:changed', (e, cfg) => cb(cfg)),
   checkUpdate: () => ipcRenderer.invoke('update:check'),
   applyUpdate: () => ipcRenderer.invoke('update:apply'),
   // qualidade do vídeo

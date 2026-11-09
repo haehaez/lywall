@@ -277,6 +277,20 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 .phcopy{padding:4px 10px;border-radius:8px;border:1px solid #2b2e35;background:#14161a;color:var(--fg);font-size:12px;cursor:pointer}
 .phcopy:hover{border-color:var(--acc)}
 .phbody small{color:#7d8088}
+/* ---- configuração remota: features desligadas, avisos e manutenção ---- */
+.feat-off{opacity:.4!important;filter:grayscale(1);pointer-events:none!important}
+#mviz.feat-off{display:none!important}
+#cfgLayer{position:fixed;top:14px;left:0;right:0;margin:0 auto;width:min(420px,calc(100vw - 24px));display:flex;flex-direction:column;gap:8px;pointer-events:none;z-index:100000}
+.cfgN{pointer-events:auto;position:relative;background:rgba(14,16,20,.95);border:1px solid rgba(203,189,239,.35);border-radius:12px;padding:12px 34px 12px 14px;color:#e8eaed;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.cfgN b{display:block;margin-bottom:4px;color:#cbbdef}
+.cfgN span{color:#c9ccd1;white-space:pre-line}
+.cfgN button{position:absolute;top:8px;right:8px;width:24px;height:24px;border:0;border-radius:6px;background:none;color:#fff;cursor:pointer}
+.cfgM{pointer-events:auto;background:rgba(14,16,20,.95);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;color:#e8eaed;font-size:13px}
+.cfgM b{display:block;margin-bottom:4px}
+.cfgM small{display:block;margin-top:6px;color:#9aa0a6;font-size:11px}
+.cfgM.on{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(8,9,12,.97);border:0;border-radius:0;z-index:100001;padding:24px}
+.cfgM.on b{font-size:22px;margin-bottom:10px}
+.cfgM.on p{font-size:15px;color:#c9ccd1;max-width:460px}
 </style>
 </head>
 <body>
@@ -1999,6 +2013,68 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession
     toast('A atualização '+i.version+' foi publicada sem assinatura, então este app não a aceita. Avise quem publica.',7000);
   });
   d.checkUpdate().then(i=>{if(i&&i.available)show(i)}).catch(()=>{});
+})();
+
+/* ---------- configuração remota (features, avisos e manutenção) ---------- */
+(function remoteConfig(){
+  const d=window.desktop;
+  const TZ_BR='America/Sao_Paulo';
+  const TZ_ME=(Intl.DateTimeFormat().resolvedOptions().timeZone)||'local';
+  const FEAT={metronomo:['metroBtn','mviz'],presets:['presetsBtn'],texto:['addtext'],timer:['tmr']};
+  const hora=(iso,tz)=>new Date(iso).toLocaleString('pt-BR',{timeZone:tz,day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  const shownTempo=new Set(),dismissed=new Set();
+  let cfg=null;
+  const layer=()=>{let b=document.getElementById('cfgLayer');if(!b){b=document.createElement('div');b.id='cfgLayer';document.body.appendChild(b)}return b};
+  function features(c){
+    const F=(c&&c.features)||{};
+    for(const k in FEAT){
+      const f=F[k],off=!!(f&&f.on===false);
+      for(const id of FEAT[k]){
+        const el=document.getElementById(id);if(!el)continue;
+        el.classList.toggle('feat-off',off);
+        if(off){if(!('lockT' in el.dataset))el.dataset.lockT=el.title||'';el.title=f.msg||'Indisponível no momento'}
+        else if('lockT' in el.dataset){el.title=el.dataset.lockT;delete el.dataset.lockT}
+        if(el.tagName==='BUTTON')el.disabled=off;
+      }
+    }
+  }
+  function notices(c){
+    const now=Date.now(),b=layer();
+    b.querySelectorAll('.cfgN').forEach(n=>n.remove());
+    for(const n of ((c&&c.notices)||[])){
+      if(!n||!n.id||dismissed.has(n.id))continue;
+      if(n.kind==='expira'&&(!n.expires||Date.parse(n.expires)<=now))continue;
+      if(n.kind==='tempo'&&shownTempo.has(n.id))continue;
+      const card=document.createElement('div');card.className='cfgN';
+      card.innerHTML='<b></b><span></span><button type="button" aria-label="Fechar">✕</button>';
+      card.querySelector('b').textContent=n.title||'Aviso';
+      card.querySelector('span').textContent=n.text||'';
+      card.querySelector('button').onclick=()=>{dismissed.add(n.id);card.remove()};
+      b.appendChild(card);
+      if(n.kind==='tempo'){shownTempo.add(n.id);setTimeout(()=>card.remove(),(Number(n.seconds)||8)*1000)}
+    }
+  }
+  function maint(c){
+    const b=layer();document.querySelectorAll('.cfgM').forEach(n=>n.remove());
+    const m=c&&c.maintenance;if(!m||!m.start||!m.end)return;
+    const now=Date.now(),s=Date.parse(m.start),e=Date.parse(m.end);
+    if(!(s>0&&e>s)||now>=e)return;
+    const ativo=now>=s;
+    const card=document.createElement('div');card.className='cfgM'+(ativo?' on':'');
+    card.innerHTML='<b></b><p></p><small></small>';
+    card.querySelector('b').textContent=ativo?'Em manutenção':'Manutenção programada';
+    card.querySelector('p').textContent=m.text||(ativo?'O app está offline por enquanto. Volte em instantes.':'O app vai ficar offline nesse período.');
+    card.querySelector('small').textContent='offline das '+hora(m.start,TZ_BR)+' até '+hora(m.end,TZ_BR)+' (Brasília) · das '+hora(m.start,TZ_ME)+' até '+hora(m.end,TZ_ME)+' no seu horário local';
+    if(ativo)document.body.appendChild(card);else b.appendChild(card);
+  }
+  function applyAll(c){cfg=c;features(c);notices(c);maint(c)}
+  async function boot(){
+    if(!d||!d.getConfig)return;
+    try{applyAll(await d.getConfig())}catch(e){}
+    if(d.onConfig)d.onConfig(c=>applyAll(c));
+    setInterval(()=>maint(cfg),30000);
+  }
+  boot();
 })();
 </script>
 </body>
