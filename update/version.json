@@ -1,8 +1,8 @@
 {
-  "version": "1.0.28",
+  "version": "1.0.29",
   "file": "index.html",
-  "releasedAt": "2026-11-09T13:11:45.789Z",
-  "notes": "- Feature desligada mostra aviso ao passar o mouse e ao clicar",
-  "sha256": "82bf70e7e8e8011953bbfa118547538f574709cbe4e061d7e9f94867bf38f819",
-  "sig": "G/H9o4Y3wHz/O1pIub4Q5jaTgF8LjiBJIocCmS+QCbPPUPOBW2WGPccYHpooB94Bo9j4c1qTj5FLIcnMmj+EBw=="
+  "releasedAt": "2026-11-09T22:53:39.720Z",
+  "notes": "+ volta do metrônomo",
+  "sha256": "e08b4c8178725bd9ab857a11976df2f7ef642137a6df3bf1981c920c04d67643",
+  "sig": "UGktggWdOxvxaChRi4hto0WBigukt+NMAiojL4/+pLNzGnb5DoMLAceZrQ6TnqFFQUMROtD4/So9eH9kNUojDQ=="
 }

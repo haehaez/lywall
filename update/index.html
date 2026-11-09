@@ -389,6 +389,10 @@ body.eco .grip,body.eco .x,body.eco .ctl{backdrop-filter:none;background:rgba(14
 <div id="bar"><div id="menu"><span id="hud" style="display:none"></span><button id="perf" type="button">Desempenho: Máximo</button><button id="add" type="button">Adicionar mídia</button><button id="addtext" type="button">Adicionar texto</button><button id="presetsBtn" type="button">Presets</button><button id="arrange" type="button">Organizar tudo</button><button id="clear" type="button">Limpar parede</button><button id="metroBtn" type="button">Metrônomo</button><button id="cfgBtn" type="button">Configurações</button></div><button id="gear" type="button" aria-label="Menu" aria-expanded="false"><span class="g1">⚙</span><span class="g2">✕</span></button></div>
 <input id="file" type="file" accept="video/*,image/*,.mkv,.mov,.mp4,.webm,.gif,.avif" multiple hidden>
 <script>
+window.__cfg=(function(){try{return JSON.parse(localStorage.getItem('ly_cfg_cache')||'null')}catch(e){return null}})();
+function featOff(k){const f=window.__cfg&&window.__cfg.features&&window.__cfg.features[k];return !!(f&&f.on===false)}
+function featMsg(k){const f=window.__cfg&&window.__cfg.features&&window.__cfg.features[k];return (f&&f.msg)||'Indisponível no momento'}
+let __fbT=0;function featBlock(k){if(!featOff(k))return false;const n=Date.now();if(n-__fbT>3000){__fbT=n;try{toast(featMsg(k),3000)}catch(e){}}return true}
 const wall=document.getElementById('wall'),empty=document.getElementById('empty'),file=document.getElementById('file');
 const GAP=4,MIN_Z=1,MAX_Z=5,MINW=120,MINH=80;
 const canvas=document.getElementById('canvas');
@@ -620,6 +624,7 @@ function openMenu(px,py,item){
   if(!item.isImg){
     cur=document.createElement('div');cur.className='mcol';menu.appendChild(cur);
     const qh=document.createElement('div');qh.className='mh';qh.textContent='Qualidade do vídeo';cur.appendChild(qh);
+    if(featOff('qualidade')){const n0=document.createElement('div');n0.className='mnote';n0.textContent=featMsg('qualidade');cur.appendChild(n0)}else{
     const d=window.desktop,can=!!(d&&d.makeProxy),hasPath=!!item.path,dis=!can||!hasPath;
     add('Original',()=>setQuality(item,0),'',!item.q);
     QUALS.forEach(q=>add(q+'p'+(item.qJob&&item.qTarget===q?' …':''),()=>setQuality(item,q),'',item.q===q,dis));
@@ -627,6 +632,7 @@ function openMenu(px,py,item){
     const n=document.createElement('div');n.className='mnote';
     n.textContent=!can?'Disponível só no app desktop (atualize o .exe).':!hasPath?'Este vídeo não tem caminho de arquivo. Solte-o pelo Explorador.':'Cria uma cópia mais leve, guardada em cache. Pode levar alguns minutos.';
     cur.appendChild(n);
+    }
   }
   menu.style.display='flex';
   const r=menu.getBoundingClientRect();
@@ -1163,6 +1169,7 @@ addEventListener('keydown',e=>{
   if(!isRedo&&!(k==='z'&&!e.shiftKey))return;
   const t=e.target;
   if(t&&t.matches&&t.matches('textarea,[contenteditable],input:not([type=range]):not([type=color])'))return;
+  if(featBlock('desfazer')){e.preventDefault();return}
   e.preventDefault();if(isRedo)redo();else undo();
 });
 addEventListener('keydown',e=>{
@@ -1180,6 +1187,7 @@ addEventListener('paste',e=>{
   if(LOCKED||PANIC)return;
   const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
   const cd=e.clipboardData;if(!cd)return;
+  if(featBlock('colar'))return;
   const ok=f=>/^(video|image)\//.test(f.type)||/\.(mp4|webm|mkv|mov|gif|avif|png|jpe?g|webp)$/i.test(f.name);
   const list=[...(cd.files||[])].filter(ok);
   if(!list.length)return;
@@ -1699,7 +1707,7 @@ const keyLabel=e=>(e.ctrlKey?'Ctrl+':'')+(e.altKey?'Alt+':'')+(e.shiftKey?'Shift
 addEventListener('keydown',e=>{
   if(CAPTURING||LOCKED)return;
   const k=PR.panic;
-  if(k&&e.code===k.code&&!!e.ctrlKey===k.ctrl&&!!e.altKey===k.alt&&!!e.shiftKey===k.shift){e.preventDefault();e.stopPropagation();PANIC?panicEnd():panic();return}
+  if(k&&e.code===k.code&&!!e.ctrlKey===k.ctrl&&!!e.altKey===k.alt&&!!e.shiftKey===k.shift){e.preventDefault();e.stopPropagation();if(!PANIC&&featBlock('panico'))return;PANIC?panicEnd():panic();return}
   if(PANIC){e.preventDefault();e.stopPropagation();panicEnd()}
 },true);
 /* nome do preset a partir dos nomes dos arquivos: só a parte "Nome" (ex.: "Sunmi Brasil - 2117644275" -> "Sunmi") */
@@ -1905,6 +1913,7 @@ function saveSessionNow(){
 }
 function restoreSession(){
   try{
+    if(featOff('restaurar'))return;
     if(PR.forget||localStorage.getItem(OKEY)==='0')return;
     if(localStorage.getItem(RKEY)==='1'){localStorage.removeItem(SKEY);localStorage.removeItem(RKEY);return}
     const s=JSON.parse(localStorage.getItem(SKEY)||'null');
@@ -1990,7 +1999,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession
     const fresh=await recheck();
     if(!fresh){end(false,'Não consegui confirmar agora');busy=false;b.disabled=false;toast('Não consegui confirmar a atualização agora.\nTente de novo em instantes.',4000);return}
     latest=fresh;clearInterval(tick);prog=0;setP(0,'Aguardando sua confirmação');
-    const ok=await ask('Baixar e aplicar a atualização?\n\nSua parede é salva e restaurada logo depois.',"Atualizar",parseNotes(fresh.notes),'se a restauração estiver ligada nas Configurações','Novidades');
+    const ok=await ask('Baixar e aplicar a atualização?\n\nSua parede é salva e restaurada logo depois.',"Atualizar",(featOff('novidades')?null:parseNotes(fresh.notes)),'se a restauração estiver ligada nas Configurações','Novidades');
     if(!ok){busy=false;b.disabled=false;show(latest);return}
     saveSessionNow();
     go(70,'Baixando');
@@ -2020,9 +2029,13 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession
   const d=window.desktop;
   const TZ_BR='America/Sao_Paulo';
   const TZ_ME=(Intl.DateTimeFormat().resolvedOptions().timeZone)||'local';
-  const FEAT={metronomo:['metroBtn','mviz'],presets:['presetsBtn'],texto:['addtext'],timer:['tmr']};
+  const FEAT={metronomo:['metroBtn','mviz'],presets:['presetsBtn'],texto:['addtext'],timer:['tmr'],economia:['perf'],pin:['pf_pinset'],panico:['pf_pset'],restaurar:['optRestore']};
+  const TX={'menu.add':'#add','menu.addtext':'#addtext','menu.presets':'#presetsBtn','menu.arrange':'#arrange','menu.clear':'#clear','menu.metro':'#metroBtn','menu.cfg':'#cfgBtn','empty.title':'#empty h1','empty.fmt1':'#empty .fmt span:nth-child(1)','empty.fmt2':'#empty .fmt span:nth-child(2)','empty.pick':'#pick','presets.title':'#presets .phd'};
+  const seenGet=()=>{try{return JSON.parse(localStorage.getItem('ly_seen_notices')||'[]')}catch(e){return[]}};
+  const seenAdd=id=>{try{const a=seenGet();if(!a.includes(id)){a.push(id);localStorage.setItem('ly_seen_notices',JSON.stringify(a.slice(-100)))}}catch(e){}};
+  function texts(c){const T=(c&&c.texts)||{};for(const k in TX){const el=document.querySelector(TX[k]);if(!el)continue;if(!('t0' in el.dataset))el.dataset.t0=el.textContent;const v=typeof T[k]==='string'&&T[k].trim()?T[k]:el.dataset.t0;if(el.textContent!==v)el.textContent=v}}
   const hora=(iso,tz)=>new Date(iso).toLocaleString('pt-BR',{timeZone:tz,day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-  const shownTempo=new Set(),dismissed=new Set();
+  const shownTempo=new Set(),dismissed=new Set(),sess=new Set();
   let cfg=null;
   const layer=()=>{let b=document.getElementById('cfgLayer');if(!b){b=document.createElement('div');b.id='cfgLayer';document.body.appendChild(b)}return b};
   function features(c){
@@ -2039,19 +2052,22 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession
   }
   function notices(c){
     const now=Date.now(),b=layer();
-    b.querySelectorAll('.cfgN').forEach(n=>n.remove());
+    b.querySelectorAll('.cfgN:not([data-tempo])').forEach(n=>n.remove());
     for(const n of ((c&&c.notices)||[])){
       if(!n||!n.id||dismissed.has(n.id))continue;
       if(n.kind==='expira'&&(!n.expires||Date.parse(n.expires)<=now))continue;
       if(n.kind==='tempo'&&shownTempo.has(n.id))continue;
-      const card=document.createElement('div');card.className='cfgN';
+      if(n.once&&seenGet().includes(n.id)&&!sess.has(n.id))continue;
+      if(n.once){seenAdd(n.id);sess.add(n.id)}
+      const card=document.createElement('div');card.className='cfgN';card.dataset.id=n.id;
       card.innerHTML='<b></b><span></span><button type="button" aria-label="Fechar">✕</button>';
       card.querySelector('b').textContent=n.title||'Aviso';
       card.querySelector('span').textContent=n.text||'';
       card.querySelector('button').onclick=()=>{dismissed.add(n.id);card.remove()};
       b.appendChild(card);
-      if(n.kind==='tempo'){shownTempo.add(n.id);setTimeout(()=>card.remove(),(Number(n.seconds)||8)*1000)}
+      if(n.kind==='tempo'){card.dataset.tempo='1';shownTempo.add(n.id);setTimeout(()=>card.remove(),(Number(n.seconds)||8)*1000)}
     }
+    for(const n of ((c&&c.notices)||[])){if(!n||!n.id)continue;const el=b.querySelector('.cfgN[data-id="'+n.id+'"]');if(el)b.appendChild(el)}
   }
   function maint(c){
     const b=layer();document.querySelectorAll('.cfgM').forEach(n=>n.remove());
@@ -2066,14 +2082,15 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession
     card.querySelector('small').textContent='offline das '+hora(m.start,TZ_BR)+' até '+hora(m.end,TZ_BR)+' (Brasília) · das '+hora(m.start,TZ_ME)+' até '+hora(m.end,TZ_ME)+' no seu horário local';
     if(ativo)document.body.appendChild(card);else b.appendChild(card);
   }
-  function applyAll(c){cfg=c;features(c);notices(c);maint(c)}
+  function applyAll(c){cfg=c;window.__cfg=c;try{localStorage.setItem('ly_cfg_cache',JSON.stringify(c))}catch(e){}features(c);texts(c);notices(c);maint(c)}
+  window.LYCFG={apply:applyAll,get:()=>cfg,texts:TX};
   async function boot(){
     if(!d||!d.getConfig)return;
     try{applyAll(await d.getConfig())}catch(e){}
     if(d.onConfig)d.onConfig(c=>applyAll(c));
     // clique em feature desligada: não executa e mostra o aviso
     document.addEventListener('click',e=>{const el=e.target.closest&&e.target.closest('[data-off]');if(!el)return;e.preventDefault();e.stopPropagation();toast(el.dataset.off,3000)},true);
-    setInterval(()=>maint(cfg),30000);
+    setInterval(()=>{maint(cfg);notices(cfg)},30000);
   }
   boot();
 })();

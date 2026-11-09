@@ -1,7 +1,8 @@
 {
+  "schema": 1,
   "features": {
     "metronomo": {
-      "on": false,
+      "on": true,
       "msg": "Metrônomo em manutenção"
     },
     "presets": {
@@ -17,8 +18,26 @@
       "msg": "Timer indisponível no momento"
     }
   },
-  "notices": [],
+  "texts": {},
+  "notices": [
+    {
+      "id": "aviso-mw9uj9lp",
+      "kind": "expira",
+      "title": "Andless",
+      "text": "We rockless are u breathless",
+      "once": false,
+      "expires": "2026-11-10T22:42:12.712Z"
+    }
+  ],
   "maintenance": null,
-  "updatedAt": "2026-11-09T12:55:42.909Z",
-  "sig": "0qsEnczlGXy1st0vGxi6S2kiRZ+sSUsuVBURubed/kwEYLZmR5lBcMXt7+kPmhMDdP5xWoZ74jmZ7qTXRRFmBA=="
+  "updates": {
+    "enabled": true,
+    "msg": ""
+  },
+  "blocked": {
+    "page": [],
+    "core": []
+  },
+  "updatedAt": "2026-11-09T22:53:14.087Z",
+  "sig": "zcfMrp6JV5ZX7xr2/CyEEs8kWRlNVXfTEWaF6++e8Lc6oMtoHQ6/hu4y9rTHO8VaDLUnVHgNkdNXAX9X86+lCQ=="
 }
