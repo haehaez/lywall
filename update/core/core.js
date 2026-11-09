@@ -382,7 +382,7 @@ function cfgSigOk(c) {
   try { return crypto.verify(null, Buffer.from(canonJSON(rest)), cfgPub, Buffer.from(c.sig, 'base64')); } catch { return false; }
 }
 let cfgCache = null;
-try { const c0 = JSON.parse(fs.readFileSync(CFG_FILE(), 'utf8')); if (cfgSigOk(c0)) cfgCache = c0; } catch {}
+try { const c0 = JSON.parse(fs.readFileSync(CFG_FILE(), 'utf8')); if (cfgSigOk(c0)) { cfgCache = c0; log('configuração ' + (c0.updatedAt || '?') + ' carregada do cache (assinatura ok)'); } } catch {}
 async function refreshConfig() {
   if (!updatesOn()) return;
   try {
@@ -394,6 +394,7 @@ async function refreshConfig() {
     const mudou = JSON.stringify(c1) !== JSON.stringify(cfgCache);
     cfgCache = c1;
     fs.writeFileSync(CFG_FILE(), JSON.stringify(c1));
+    if (mudou) log('configuração ' + (c1.updatedAt || '?') + ' aceita (assinatura ok)');
     if (mudou && win && !win.isDestroyed()) win.webContents.send('cfg:changed', cfgCache);
   } catch (e) { log('configuração: ' + (e && e.message)); }
 }
