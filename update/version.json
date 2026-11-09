@@ -1,8 +1,8 @@
 {
-  "version": "1.0.26",
+  "version": "1.0.27",
   "file": "index.html",
-  "releasedAt": "2026-11-09T12:31:11.697Z",
-  "notes": "+ Painel de avisos e manutenção\n+ Features podem ser desligadas remotamente",
+  "releasedAt": "2026-11-09T12:48:29.657Z",
+  "notes": "+ Avisos e manutenção com horário local\n+ Features podem ser desligadas remotamente\n- Barra de atualização não trava mais em 100%\n- Metrônomo vertical com bolinhas menores\n- Indicador de qualidade ao lado do botão de pausar",
   "sha256": "1191b908e89f3ed1d286b13606db94ebe5ae273b3be8493de9474724ebb340ad",
-  "sig": "+7Q1bFzjW44C1+/6X0GITASX0e4jFuEtta7w2mvcolqO08Xj3Tm5+3uEMYK/MgSNzsaDO3M+e3HoPYW0VdRDDQ=="
+  "sig": "Lza5Ya9Ef4L6NrzQvEjkCp/PcFS8aRHF9YLCg/5EFtLsRtol1w98uqWdEbqRvmpHACCzR7v8A6j20/k0E+g2DA=="
 }
