@@ -1,0 +1,24 @@
+{
+  "features": {
+    "metronomo": {
+      "on": true,
+      "msg": "Metrônomo em manutenção"
+    },
+    "presets": {
+      "on": true,
+      "msg": "Presets indisponíveis no momento"
+    },
+    "texto": {
+      "on": true,
+      "msg": "Texto indisponível no momento"
+    },
+    "timer": {
+      "on": true,
+      "msg": "Timer indisponível no momento"
+    }
+  },
+  "notices": [],
+  "maintenance": null,
+  "updatedAt": "2026-11-09T12:29:32.045Z",
+  "sig": "vNjS2sayAdNhhlc1b9Vb6DOR6mfMQw4eTcscCIdFfLOdqe2hf1sxgn+EJ8XSxd2minKZt6OJAbwiMC0NGsipDA=="
+}
