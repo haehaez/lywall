@@ -1091,7 +1091,7 @@ function addVideo(f,opt){
   el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
   el.addEventListener('pointerenter',()=>{item.hov=performance.now();setTimeout(schedule,300)});
   el.addEventListener('pointerleave',()=>{item.hov=0;schedule()});
-  el.addEventListener('dblclick',e=>{if(e.target.closest('.ctl,.x,.hd,.grip,.pz'))return;vTouch();item.px=50;item.py=50;item.z=1;apply()});
+  el.addEventListener('dblclick',e=>{if(!(e.target===item.v||e.target===item.frz))return;if(item.isImg&&item.pz.style.display==='none')return;userPause(item,!item.userPaused)});
 
   item.hide=()=>{
     if(item.hidden)return;item.hidden=true;cancelQ(item);clearTimeout(item.unT);
@@ -1984,7 +1984,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession
       go(85,'Tentando de novo');
       const f2=await recheck();if(f2){latest=f2;r=await apply()}
     }
-    if(r&&r.ok){go(96,'Verificando');end(true,'Aplicando 100%')}
+    if(r&&r.ok&&r.restart){go(96,'Reiniciando');end(true,'Reiniciando o app...');setTimeout(()=>setP(100,'Feche e abra o app para concluir'),8000)}
+    else if(r&&r.ok){go(96,'Verificando');end(true,'Aplicando 100%')}
     else{end(false,'Falhou — '+((r&&r.error)||'erro desconhecido').slice(0,60));busy=false;b.disabled=false;toast('Não foi possível atualizar: '+((r&&r.error)||'erro desconhecido')+'\nTente de novo em alguns minutos.',7000)}
   };
   d.onUpdate(show);

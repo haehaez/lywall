@@ -1,8 +1,8 @@
 {
-  "version": "1.0.23",
+  "version": "1.0.24",
   "file": "index.html",
-  "releasedAt": "2026-11-08T23:11:01.479Z",
-  "notes": "- Duplo clique pausando\n+ Duplo clique volta o zoom\n+ Pausa só pelo botão",
-  "sha256": "cc47f3ef5143b087b7c643e0600b848ec881139850e2bcb6f66d63d8c7d16471",
-  "sig": "bhMXKdKeY4tkrhYOt6lop7+E1oJlwjqOpE7epiyA9EU4XlSVzZAGt4VflVMBlRgMQQuZdFDXR4hCLqVlcIYZAg=="
+  "releasedAt": "2026-11-09T10:54:30.393Z",
+  "notes": "+ Reinicia sozinho ao aplicar o programa\n- Barra não fica mais travada em 100%",
+  "sha256": "3529c8f0d19e02bae083f7539ec8cf583a2e66002dec9c141faf62ca03b4fd7f",
+  "sig": "AqISfOrY7o9tjcwOJoprpkJjH3I3YIReSoQSrUdWIK+Ac4X4nhEed5xzau39TbBnUyRf19lMnkkkUcl0SiZYBA=="
 }
