@@ -9,8 +9,17 @@ const MAX_CACHE = 3 * 1024 * 1024 * 1024; // 3 GB
 
 function ffmpegBin() {
   if (process.env.LY_FFMPEG) return process.env.LY_FFMPEG; // usado nos testes
+  // O programa pode rodar de uma pasta baixada (AppData\\...\\core-remote), onde não existe node_modules.
+  // Por isso o ffmpeg-static também é procurado a partir da pasta do app instalado.
+  const tries = [() => require('ffmpeg-static')];
+  const from = (dir) => () => require('module').createRequire(path.join(dir, 'package.json'))('ffmpeg-static');
+  try { tries.push(from(require('electron').app.getAppPath())); } catch {}
+  if (process.resourcesPath) tries.push(from(path.join(process.resourcesPath, 'app.asar')));
+  let p = null;
+  for (const t of tries) { try { p = t(); if (p) break; } catch {} }
+  if (!p) throw new Error('ffmpeg-static não encontrado');
   // dentro do .exe o binário fica em app.asar.unpacked
-  return require('ffmpeg-static').replace(/app\.asar([\\/])/, 'app.asar.unpacked$1');
+  return String(p).replace(/app\.asar([\\/])/, 'app.asar.unpacked$1');
 }
 
 // testa uma vez se o encoder da placa NVIDIA (NVENC) funciona neste computador
@@ -148,4 +157,4 @@ function createProxyManager(dir, opts) {
   return { start, cancel, cancelAll };
 }
 
-module.exports = { createProxyManager };
+module.exports = { createProxyManager, ffmpegBin };

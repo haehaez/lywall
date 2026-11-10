@@ -358,7 +358,8 @@ function createWindow() {
     } catch {}
   };
   setTimeout(poll, 4000);
-  setInterval(poll, 30 * 60 * 1000);
+  let lastPoll = Date.now();
+  setInterval(() => { if (Date.now() - lastPoll >= cfgNum('updateCheckMin', 30) * 60000) { lastPoll = Date.now(); poll(); } }, 60000);
 }
 
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.focus(); } });
@@ -404,8 +405,10 @@ async function refreshConfig() {
     if (mudou && win && !win.isDestroyed()) win.webContents.send('cfg:changed', cfgCache);
   } catch (e) { log('configuração: ' + (e && e.message)); }
 }
+const cfgNum = (k, d) => { const n = cfgCache && cfgCache.numbers && cfgCache.numbers[k]; return typeof n === 'number' && isFinite(n) ? n : d; };
 const cfgList = (k) => { const b = cfgCache && cfgCache.blocked; return b && Array.isArray(b[k]) ? b[k].map(String) : []; };
 ipcMain.handle('cfg:get', () => cfgCache);
 ipcMain.handle('cfg:refresh', () => refreshConfig().then(() => cfgCache));
 refreshConfig();
-setInterval(refreshConfig, 30 * 60 * 1000);
+let lastCfg = Date.now();
+setInterval(() => { if (Date.now() - lastCfg >= cfgNum('configCheckMin', 30) * 60000) { lastCfg = Date.now(); refreshConfig(); } }, 60000);
