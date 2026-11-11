@@ -1,8 +1,8 @@
 {
-  "version": "1.0.29",
+  "version": "1.0.30",
   "file": "index.html",
-  "releasedAt": "2026-11-09T22:53:39.720Z",
-  "notes": "+ volta do metrônomo",
-  "sha256": "e08b4c8178725bd9ab857a11976df2f7ef642137a6df3bf1981c920c04d67643",
-  "sig": "UGktggWdOxvxaChRi4hto0WBigukt+NMAiojL4/+pLNzGnb5DoMLAceZrQ6TnqFFQUMROtD4/So9eH9kNUojDQ=="
+  "releasedAt": "2026-11-11T05:27:25.552Z",
+  "notes": "+ Caixa de aviso com fontes e efeitos\n+ Selos NOVO e ATUALIZADO\n+ Adicionar texto com fontes, efeitos e paletas\n- Aviso centralizado\n- Chip de qualidade alinhado",
+  "sha256": "d29b45a93a3aa1f7252d8e02e500e35f99ae9345ef00d004ae80cf561cbc2785",
+  "sig": "h/sKOHOkfzTOiYzHfC/tF6L6goOFUi5BE6x8mWbHItKMgVV+Eql7CFdtdW0x4oMvEQiM3z2NPO7SnAfJBSM2Cg=="
 }
