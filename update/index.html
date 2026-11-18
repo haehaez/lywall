@@ -1211,7 +1211,8 @@ function addVideo(f,opt){
   },{passive:false});
   apply();item.apply=apply;item.removeFn=()=>x.click();
   /* fotos grandes: mostra uma cópia reduzida (Lanczos, ~1,5x do tamanho na tela) para não serrilhar fios finos */
-  if(isImg&&!animated&&item.path&&window.desktop&&window.desktop.shrinkImage&&/\.(jpe?g|png|webp|bmp)$/i.test(item.path)){
+  const viaMain=!!(item.path&&window.desktop&&window.desktop.shrinkImage&&/\.(jpe?g|png|webp|bmp|gif)$/i.test(item.path));
+  if(isImg&&(viaMain||!animated)){
     let ft=0,curW=0,busy=false,again=false;
     const fileUrl=p=>'file:///'+encodeURI(p.replace(/\\/g,'/').replace(/^\/+/,'')).replace(/#/g,'%23').replace(/\?/g,'%3F');
     const fit=async()=>{
@@ -1219,19 +1220,29 @@ function addVideo(f,opt){
       const nw=item.natW||v.naturalWidth,nh=item.natH||v.naturalHeight,tw=el.clientWidth,th=el.clientHeight;
       if(!nw||!nh||!tw||!th)return;
       const s=Math.max(tw/nw,th/nh)*item.z*(window.devicePixelRatio||1)*1.5;
+      if(item.frz&&item.frzFit)item.frzFit();
       if(s>=0.85){if(curW){curW=0;v.src=url}return}          /* quase sem redução: usa o original */
       const want=Math.min(nw,Math.max(256,Math.ceil(nw*s/256)*256));
       if(want>=nw*0.85){if(curW){curW=0;v.src=url}return}
       if(curW&&want<=curW)return;                             /* já tem cópia boa o bastante */
       busy=true;
       try{
-        const r=await window.desktop.shrinkImage(item.path,want);
+        let r=viaMain?await window.desktop.shrinkImage(item.path,want):null;
         if(r&&r.ok&&r.path&&tiles.includes(item)){
           const im=new Image();im.decoding='async';im.src=fileUrl(r.path);
           await im.decode();
           if(tiles.includes(item)){curW=want;v.src=im.src}
+        }else if(!viaMain||!(r&&r.ok)){
+          /* sem caminho do arquivo (colada/arrastada do navegador) ou sem ffmpeg: reduz aqui, por etapas */
+          if(!item.origImg){const o=new Image();o.src=url;await o.decode();item.origImg=o}
+          let c=item.origImg,w=nw,h=nh;
+          while(w/2>=want){const t=document.createElement('canvas');t.width=Math.round(w/2);t.height=Math.round(h/2);const x=t.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(c,0,0,t.width,t.height);c=t;w=t.width;h=t.height}
+          const f=document.createElement('canvas');f.width=want;f.height=Math.max(1,Math.round(nh*want/nw));const x=f.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(c,0,0,f.width,f.height);
+          const blob=await new Promise(res=>f.toBlob(res,'image/webp',0.95));
+          if(blob&&tiles.includes(item)){const u=URL.createObjectURL(blob);const im=new Image();im.src=u;await im.decode();
+            if(tiles.includes(item)){curW=want;const prev=item.fitUrl;item.fitUrl=u;v.src=u;if(prev)URL.revokeObjectURL(prev)}else URL.revokeObjectURL(u)}
         }
-      }catch(e){}
+      }catch(e){item.fitErr=String(e&&e.message||e)}
       busy=false;if(again){again=false;item.fit()}
     };
     item.fit=()=>{clearTimeout(ft);ft=setTimeout(fit,350)};
@@ -1917,13 +1928,25 @@ function userPause(item,on){
   }else{
     if(on&&!item.frz){
       const c=document.createElement('canvas');c.className='frz';
-      c.width=item.v.naturalWidth||1;c.height=item.v.naturalHeight||1;
-      try{c.getContext('2d').drawImage(item.v,0,0)}catch(e){}
+      /* quadro parado: copia o quadro inteiro e reduz por etapas (média) até ~1,5x o tamanho na tela, sem serrilhar */
+      const full=document.createElement('canvas');full.width=item.v.naturalWidth||1;full.height=item.v.naturalHeight||1;
+      try{full.getContext('2d').drawImage(item.v,0,0)}catch(e){}
+      item.frzFit=()=>{
+        const nw=full.width,nh=full.height,tw=item.el.clientWidth,th=item.el.clientHeight;
+        let want=nw;
+        if(tw&&th){const s=Math.max(tw/nw,th/nh)*item.z*(window.devicePixelRatio||1)*1.5;want=Math.min(nw,Math.max(64,Math.ceil(nw*s)))}
+        if(c.width>=want&&c.width<=want*1.25&&c.width>1)return;
+        let src=full,w=nw,h=nh;
+        while(w/2>=want){const t=document.createElement('canvas');t.width=Math.max(1,Math.round(w/2));t.height=Math.max(1,Math.round(h/2));const x=t.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(src,0,0,t.width,t.height);src=t;w=t.width;h=t.height}
+        const fw=Math.max(1,Math.round(want)),fh=Math.max(1,Math.round(nh*fw/nw));
+        c.width=fw;c.height=fh;const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(src,0,0,fw,fh);
+      };
+      item.frzFit();
       item.el.insertBefore(c,item.pz);item.frz=c;item.v.style.visibility='hidden';
       const sync=()=>{c.style.objectPosition=item.v.style.objectPosition;c.style.transform=item.v.style.transform;c.style.transformOrigin=item.v.style.transformOrigin};
       sync();item.frzObs=new MutationObserver(sync);item.frzObs.observe(item.v,{attributes:true,attributeFilter:['style']});
     }
-    if(!on&&item.frz){item.frzObs&&item.frzObs.disconnect();item.frz.remove();item.frz=null;item.v.style.visibility=''}
+    if(!on&&item.frz){item.frzObs&&item.frzObs.disconnect();item.frz.remove();item.frz=null;item.frzFit=null;item.v.style.visibility=''}
   }
   item.el.classList.toggle('paused',item.userPaused);
   item.pz.textContent=item.userPaused?'▶':'❚❚';

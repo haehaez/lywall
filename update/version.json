@@ -1,8 +1,8 @@
 {
-  "version": "1.0.31",
+  "version": "1.0.32",
   "file": "index.html",
-  "releasedAt": "2026-11-18T09:36:46.916Z",
-  "notes": "+ Fotos grandes ficam nítidas (sem serrilhado no cabelo)",
-  "sha256": "bffa3d43ad66bffe17c62a25ad475c7089ed32c7edc0454949faf2a3629c1a7c",
-  "sig": "YXq3D7dzJcQl7oq8aA5oLhVQbNTsNvcOW6CUPoaRWNmUfmuYR0/Ag6pG+FGEcCny0J7K/fsN75Cz3KeROAWbCw=="
+  "releasedAt": "2026-11-18T16:10:15.662Z",
+  "notes": "+ Fotos e GIFs ficam nítidos (sem serrilhado)",
+  "sha256": "a92e2e37e5d37c0f72d479ae496419a80bbcafa2fbc897e7af19299f0fb66286",
+  "sig": "1zGVANGWzZoag2TycB5lmQqRc6UpZ1drEo4FNmsOVoa1B+kz84jNmIPQsNb7CIjtVdjt/vvN8hTv+LTdm986CQ=="
 }
