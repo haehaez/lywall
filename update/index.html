@@ -1203,13 +1203,42 @@ function addVideo(f,opt){
   const vb=()=>({px:item.px,py:item.py,z:item.z});
   const vCommit=()=>{clearTimeout(bt);if(burst){const b=burst;burst=null;if(Math.abs(b.px-item.px)+Math.abs(b.py-item.py)>.2||Math.abs(b.z-item.z)>.001)hpush({t:'view',item,px:b.px,py:b.py,z:b.z})}};
   const vTouch=()=>{if(!burst)burst=vb();clearTimeout(bt);bt=setTimeout(vCommit,700)};
-  const setZoom=z=>{vTouch();item.z=lim(z,MIN_Z,MAX_Z);apply()};
+  const setZoom=z=>{vTouch();item.z=lim(z,MIN_Z,MAX_Z);apply();if(item.fit)item.fit()};
   zm.onclick=()=>setZoom(item.z/1.2);zp.onclick=()=>setZoom(item.z*1.2);
   el.addEventListener('wheel',e=>{
     if(!e.ctrlKey&&CH>vh()+1)return;
     e.preventDefault();setZoom(item.z*(e.deltaY<0?1.1:1/1.1));
   },{passive:false});
   apply();item.apply=apply;item.removeFn=()=>x.click();
+  /* fotos grandes: mostra uma cópia reduzida (Lanczos, ~1,5x do tamanho na tela) para não serrilhar fios finos */
+  if(isImg&&!animated&&item.path&&window.desktop&&window.desktop.shrinkImage&&/\.(jpe?g|png|webp|bmp)$/i.test(item.path)){
+    let ft=0,curW=0,busy=false,again=false;
+    const fileUrl=p=>'file:///'+encodeURI(p.replace(/\\/g,'/').replace(/^\/+/,'')).replace(/#/g,'%23').replace(/\?/g,'%3F');
+    const fit=async()=>{
+      if(busy){again=true;return}
+      const nw=item.natW||v.naturalWidth,nh=item.natH||v.naturalHeight,tw=el.clientWidth,th=el.clientHeight;
+      if(!nw||!nh||!tw||!th)return;
+      const s=Math.max(tw/nw,th/nh)*item.z*(window.devicePixelRatio||1)*1.5;
+      if(s>=0.85){if(curW){curW=0;v.src=url}return}          /* quase sem redução: usa o original */
+      const want=Math.min(nw,Math.max(256,Math.ceil(nw*s/256)*256));
+      if(want>=nw*0.85){if(curW){curW=0;v.src=url}return}
+      if(curW&&want<=curW)return;                             /* já tem cópia boa o bastante */
+      busy=true;
+      try{
+        const r=await window.desktop.shrinkImage(item.path,want);
+        if(r&&r.ok&&r.path&&tiles.includes(item)){
+          const im=new Image();im.decoding='async';im.src=fileUrl(r.path);
+          await im.decode();
+          if(tiles.includes(item)){curW=want;v.src=im.src}
+        }
+      }catch(e){}
+      busy=false;if(again){again=false;item.fit()}
+    };
+    item.fit=()=>{clearTimeout(ft);ft=setTimeout(fit,350)};
+    const first=()=>{item.natW=v.naturalWidth;item.natH=v.naturalHeight;item.fit()};
+    if(v.complete&&v.naturalWidth)first();else v.addEventListener('load',()=>{if(!item.natW)first()});
+    if(window.ResizeObserver)new ResizeObserver(()=>item.fit()).observe(el);
+  }
   if(opt&&opt.state){
     const st=opt.state;
     item.px=+st.px||50;item.py=+st.py||50;item.z=Math.min(MAX_Z,Math.max(MIN_Z,+st.z||1));apply();
