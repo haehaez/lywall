@@ -1,10 +1,10 @@
 {
-  "version": "1.7.9",
-  "releasedAt": "2026-11-18T09:36:46.001Z",
+  "version": "1.7.10",
+  "releasedAt": "2026-11-18T16:10:14.663Z",
   "files": {
-    "core.js": "65c02c35cc81e42224e1283a1685a27015234321050580e45022663b428ceff7",
-    "proxy.js": "533a83697d512dd4abab68cfe6acf822de670fb2cec4c90d4373805a67711d7e",
+    "core.js": "445a49c5f908313568cea2a19f279352d6aeeeb649d98a4b32e22f545626fdb1",
+    "proxy.js": "c4cdc837a334406e0014694b1c7ac522330a994278c5820e7d696440575e9357",
     "preload.js": "bed13df531cf55d888f161f34a0e5ebb902a64247047a4e5d872e23e78dda049"
   },
-  "sig": "R9RhFQI01autAc+7C9FfHnxO2DRFJD5j14pGOMtU6MJgP9VV9ZSqZtH1097Lgt15Fk3NhA6JO7XRzGGS/gKlCQ=="
+  "sig": "R32kFdP4Zbut0//J5mIlR5y3lvKwVIrapGwEC0UG+cECNjUxE92uPVf1DKxDovlKfUl9OFscIdr1xl3z7RGKCA=="
 }

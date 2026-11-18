@@ -301,14 +301,14 @@ ipcMain.handle('proxy:start', (e, a) => {
       .catch((err) => ({ ok: false, error: String(err && err.message || err) }));
   } catch (err) { return { ok: false, error: String(err && err.message || err) }; }
 });
-const IMG_EXT = /\.(jpe?g|png|webp|bmp)$/i;
+const IMG_EXT = /\.(jpe?g|png|webp|bmp|gif)$/i;
 ipcMain.handle('img:shrink', (e, a) => {
   try {
     if (!proxies) proxies = createProxyManager(dataPath('proxies'), { log });
     const src = String(a && a.path || ''), w = Math.round(Number(a && a.width));
     if (!path.isAbsolute(src) || !IMG_EXT.test(src)) return { ok: false, error: 'Arquivo inválido.' };
     if (!(w >= 64 && w <= 8192)) return { ok: false, error: 'Tamanho inválido.' };
-    return proxies.shrinkImage(src, w).catch((err) => ({ ok: false, error: String(err && err.message || err) }));
+    return proxies.shrinkImage(src, w).then((r) => { log('imagem: ' + path.basename(src) + ' -> ' + w + ' px ' + (r.ok ? (r.cached ? '(cache)' : 'ok') : 'falhou')); return r; }).catch((err) => ({ ok: false, error: String(err && err.message || err) }));
   } catch (err) { return { ok: false, error: String(err && err.message || err) }; }
 });
 ipcMain.handle('proxy:cancel', (e, id) => (proxies ? proxies.cancel(String(id)) : false));

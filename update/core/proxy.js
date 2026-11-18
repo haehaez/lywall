@@ -50,8 +50,8 @@ function createProxyManager(dir, opts) {
       const p = path.join(dir, n), s = fs.statSync(p);
       return { p, n, size: s.size, t: s.mtimeMs };
     });
-    files.filter((f) => /\.part\.(mp4|jpg|png)$/.test(f.n)).forEach((f) => fs.unlinkSync(f.p));
-    let list = files.filter((f) => !/\.part\.(mp4|jpg|png)$/.test(f.n)).sort((a, b) => a.t - b.t);
+    files.filter((f) => /\.part\.(mp4|jpg|png|webp)$/.test(f.n)).forEach((f) => fs.unlinkSync(f.p));
+    let list = files.filter((f) => !/\.part\.(mp4|jpg|png|webp)$/.test(f.n)).sort((a, b) => a.t - b.t);
     let total = list.reduce((a, f) => a + f.size, 0);
     while (total > MAX_CACHE && list.length) { const f = list.shift(); try { fs.unlinkSync(f.p); } catch {} total -= f.size; }
   } catch {}
@@ -161,20 +161,21 @@ function createProxyManager(dir, opts) {
       let st, out;
       try {
         st = fs.statSync(src);
-        const ext = /\.png$/i.test(src) ? 'png' : 'jpg';
+        const ext = /\.gif$/i.test(src) ? 'webp' : /\.png$/i.test(src) ? 'png' : 'jpg';
         const key = crypto.createHash('sha1').update(`img|${src}|${st.size}|${st.mtimeMs}|${width}`).digest('hex').slice(0, 24);
         out = path.join(dir, `img_${key}_${width}.${ext}`);
       } catch { return resolve({ ok: false, error: 'Arquivo não encontrado.' }); }
       if (fs.existsSync(out)) { try { const n = new Date(); fs.utimesSync(out, n, n); } catch {} return resolve({ ok: true, path: out, cached: true }); }
-      const tmp = out.replace(/\.(jpg|png)$/, '.part.$1');
-      const q = /\.png$/i.test(out) ? [] : ['-q:v', '2'];
+      const tmp = out.replace(/\.(jpg|png|webp)$/, '.part.$1');
+      const isGif = /\.webp$/.test(out);
+      const q = isGif ? ['-c:v', 'libwebp_anim', '-quality', '90', '-loop', '0'] : /\.png$/i.test(out) ? [] : ['-q:v', '2'];
       let proc;
       try {
-        proc = spawn(ffmpegBin(), ['-hide_banner', '-loglevel', 'error', '-y', '-i', src, '-frames:v', '1',
+        proc = spawn(ffmpegBin(), ['-hide_banner', '-loglevel', 'error', '-y', '-i', src, ...(isGif ? [] : ['-frames:v', '1']),
           '-vf', `scale=w=${width}:h=-2:flags=lanczos+accurate_rnd+full_chroma_int`, ...q, tmp], { windowsHide: true });
       } catch { return resolve({ ok: false, error: 'ffmpeg não encontrado.' }); }
       try { os.setPriority(proc.pid, os.constants.priority.PRIORITY_BELOW_NORMAL); } catch {}
-      const t = setTimeout(() => { try { proc.kill(); } catch {} }, 60000);
+      const t = setTimeout(() => { try { proc.kill(); } catch {} }, isGif ? 240000 : 60000);
       let err = '';
       proc.stderr.on('data', (d) => { err = (err + d).slice(-500); });
       proc.on('error', () => { clearTimeout(t); resolve({ ok: false, error: 'Não foi possível iniciar o ffmpeg.' }); });
