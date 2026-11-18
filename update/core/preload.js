@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld('desktop', {
   applyUpdate: () => ipcRenderer.invoke('update:apply'),
   // qualidade do vídeo
   makeProxy: (id, path, height) => ipcRenderer.invoke('proxy:start', { id, path, height }),
+  shrinkImage: (path, width) => ipcRenderer.invoke('img:shrink', { path, width }),
   cancelProxy: (id) => ipcRenderer.invoke('proxy:cancel', id),
   onProxyProgress: (cb) => ipcRenderer.on('proxy:progress', (_e, d) => cb(d)),
   onUpdateInvalid: (cb) => ipcRenderer.on('update:invalid', (_e, info) => cb(info)),

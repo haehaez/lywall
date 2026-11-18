@@ -301,6 +301,16 @@ ipcMain.handle('proxy:start', (e, a) => {
       .catch((err) => ({ ok: false, error: String(err && err.message || err) }));
   } catch (err) { return { ok: false, error: String(err && err.message || err) }; }
 });
+const IMG_EXT = /\.(jpe?g|png|webp|bmp)$/i;
+ipcMain.handle('img:shrink', (e, a) => {
+  try {
+    if (!proxies) proxies = createProxyManager(dataPath('proxies'), { log });
+    const src = String(a && a.path || ''), w = Math.round(Number(a && a.width));
+    if (!path.isAbsolute(src) || !IMG_EXT.test(src)) return { ok: false, error: 'Arquivo inválido.' };
+    if (!(w >= 64 && w <= 8192)) return { ok: false, error: 'Tamanho inválido.' };
+    return proxies.shrinkImage(src, w).catch((err) => ({ ok: false, error: String(err && err.message || err) }));
+  } catch (err) { return { ok: false, error: String(err && err.message || err) }; }
+});
 ipcMain.handle('proxy:cancel', (e, id) => (proxies ? proxies.cancel(String(id)) : false));
 
 // ---------- janela ----------
