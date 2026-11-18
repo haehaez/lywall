@@ -1,8 +1,8 @@
 {
-  "version": "1.0.32",
+  "version": "1.0.33",
   "file": "index.html",
-  "releasedAt": "2026-11-18T16:10:15.662Z",
-  "notes": "+ Fotos e GIFs ficam nítidos (sem serrilhado)",
-  "sha256": "a92e2e37e5d37c0f72d479ae496419a80bbcafa2fbc897e7af19299f0fb66286",
-  "sig": "1zGVANGWzZoag2TycB5lmQqRc6UpZ1drEo4FNmsOVoa1B+kz84jNmIPQsNb7CIjtVdjt/vvN8hTv+LTdm986CQ=="
+  "releasedAt": "2026-11-18T17:34:10.762Z",
+  "notes": "+ Texto com linha minhoca até o vídeo/imagem\n+ Rastro de partículas atrás da caixa de texto",
+  "sha256": "03a586922cab7c9eec7d8c0b481edab3e952b312413e66197fd5a92c24def5ed",
+  "sig": "ZUzbPnLHtgJjsFDW3bbM3Pk2u1xbrtTOefQjlNinL2IXui+IYI00sCIrc7Uk0u03sk71e8ITG0WE/KXNVuYjDQ=="
 }
